@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
-using SportsRu.Alice.Tests.TestsInfrastructure;
+using Sports.Alice;
+using Sports.Alice.Tests.TestsInfrastructure;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -9,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SportsRu.Alice.Tests.Controllers
+namespace Sports.Alice.Tests.Controllers
 {
     public class AliceControllerTests
     {

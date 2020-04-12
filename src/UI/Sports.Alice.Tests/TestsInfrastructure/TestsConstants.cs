@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SportsRu.Alice.Tests.TestsInfrastructure
+namespace Sports.Alice.Tests.TestsInfrastructure
 {
     public static class TestsConstants
     {

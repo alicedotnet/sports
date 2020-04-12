@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SportsRu.Alice\SportsRu.Alice.csproj" />
+    <ProjectReference Include="..\Sports.Alice\Sports.Alice.csproj" />
   </ItemGroup>
 
   <ItemGroup>

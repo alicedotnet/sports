@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Yandex.Alice.Sdk.Models;
 
-namespace SportsRu.Alice.Controllers
+namespace Sports.Alice.Controllers
 {
     [ApiController]
     public class AliceController : ControllerBase

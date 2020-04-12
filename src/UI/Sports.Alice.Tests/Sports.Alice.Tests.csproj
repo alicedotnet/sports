@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Sports.Common.Tests\Sports.Common.Tests.csproj" />
     <ProjectReference Include="..\Sports.Alice\Sports.Alice.csproj" />
   </ItemGroup>
 

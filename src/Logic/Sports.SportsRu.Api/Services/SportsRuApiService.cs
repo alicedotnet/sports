@@ -89,5 +89,18 @@ namespace Sports.SportsRu.Api.Services
             }
             return ServiceResponse<CommentIdsResponse>.Error(content);
         }
+
+        public async Task<ServiceResponse<CommentByIdsResponse>> GetCommentsByIds(IEnumerable<int> ids)
+        {
+            string commentsIds = string.Join(",", ids);
+            var response = await _httpClient.GetAsync($"api/comment/get/by_ids.json?comment_ids={commentsIds}&style=newjs").ConfigureAwait(false);
+            string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
+            {
+                var commentsByIdsResponse = JsonSerializer.Deserialize<CommentByIdsResponse>(content);
+                return ServiceResponse<CommentByIdsResponse>.Success(commentsByIdsResponse);
+            }
+            return ServiceResponse<CommentByIdsResponse>.Error(content);
+        }
     }
 }

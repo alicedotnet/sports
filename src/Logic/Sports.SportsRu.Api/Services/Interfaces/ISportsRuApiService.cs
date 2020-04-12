@@ -11,5 +11,6 @@ namespace Sports.SportsRu.Api.Services.Interfaces
     {
         Task<ServiceResponse<NewsResponse>> GetNewsAsync(NewsType newsType, NewsPriority newsPriority, NewsContentOrigin newsContentOrigin, int count);
         Task<ServiceResponse<CommentIdsResponse>> GetCommentsIdsAsync(int messageId, MessageClass messageClass, Sort sort);
+        Task<ServiceResponse<CommentByIdsResponse>> GetCommentsByIds(IEnumerable<int> ids);
     }
 }

@@ -1,12 +1,9 @@
-﻿using Sports.SportsRu.Api.Models;
+﻿using Sports.Common.Tests;
+using Sports.SportsRu.Api.Models;
 using Sports.SportsRu.Api.Services.Interfaces;
 using Sports.SportsRu.Api.Tests.TestsInfrastructure;
 using Sports.SportsRu.Api.Tests.TestsInfrastructure.Fixtures;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,15 +11,14 @@ using Xunit.Abstractions;
 namespace Sports.SportsRu.Api.Tests.Services
 {
     [Collection(TestsConstants.SportsRuApiCollectionName)]
-    public class SportsRuApiServiceTests
+    public class SportsRuApiServiceTests : BaseTests
     {
         private readonly ISportsRuApiService _sportsRuApiService;
-        private readonly ITestOutputHelper _testOutputHelper;
 
         public SportsRuApiServiceTests(SportsRuApiFixture sportsRuApiFixture, ITestOutputHelper testOutputHelper)
+            : base(testOutputHelper)
         {
             _sportsRuApiService = sportsRuApiFixture.SportsRuApiService;
-            _testOutputHelper = testOutputHelper;
         }
 
         [Fact]
@@ -38,23 +34,42 @@ namespace Sports.SportsRu.Api.Tests.Services
                 Assert.NotNull(item.Title);
                 Assert.NotEqual(0, item.Id);
             }
-            _testOutputHelper.WriteLine(JsonSerializer.Serialize(newsResponse.Content, new JsonSerializerOptions() { WriteIndented = true }));
+            WritePrettyJson(newsResponse.Content);
         }
 
         [Fact]
         public async Task GetCommentsIds()
         {
-            var newsResponse = await _sportsRuApiService
-                .GetNewsAsync(NewsType.HomePage, NewsPriority.Main, NewsContentOrigin.Mixed, 10).ConfigureAwait(false);
-            var commentsResponse = await _sportsRuApiService.GetCommentsIdsAsync(newsResponse.Content.First().Id, MessageClass.News, Sort.Top10);
-            Assert.True(commentsResponse.IsSuccess, commentsResponse.ErrorMessage);
-            Assert.NotNull(commentsResponse.Content);
-            Assert.NotEmpty(commentsResponse.Content);
-            foreach (var item in commentsResponse.Content)
+            int id = 1084853230; //https://www.sports.ru/football/1084853230.html
+            var commentsIdsResponse = await _sportsRuApiService.GetCommentsIdsAsync(id, MessageClass.News, Sort.Top10);
+            Assert.True(commentsIdsResponse.IsSuccess, commentsIdsResponse.ErrorMessage);
+            Assert.NotNull(commentsIdsResponse.Content);
+            Assert.NotEmpty(commentsIdsResponse.Content);
+            foreach (var item in commentsIdsResponse.Content)
             {
+
                 Assert.NotEqual(0, item);
             }
-            _testOutputHelper.WriteLine(JsonSerializer.Serialize(commentsResponse.Content, new JsonSerializerOptions() { WriteIndented = true }));
+            WritePrettyJson(commentsIdsResponse.Content);
+        }
+
+        [Fact]
+        public async Task GetCommentsByIds()
+        {
+            var commentsIds = new int[] { 1084853975, 1084853842 };//comments ids from https://www.sports.ru/football/1084853230.html
+            var commentsByIdsResponse = await _sportsRuApiService.GetCommentsByIds(commentsIds);
+            Assert.True(commentsByIdsResponse.IsSuccess, commentsByIdsResponse.ErrorMessage);
+            Assert.NotNull(commentsByIdsResponse.Content);
+            Assert.NotNull(commentsByIdsResponse.Content.Data);
+            Assert.NotNull(commentsByIdsResponse.Content.Data.Comments);
+            Assert.NotEmpty(commentsByIdsResponse.Content.Data.Comments);
+            foreach (var comment in commentsByIdsResponse.Content.Data.Comments)
+            {
+                Assert.NotEqual(0, comment.Id);
+                Assert.NotNull(comment.Text);
+                Assert.NotNull(comment.Rating);
+            }
+            WritePrettyJson(commentsByIdsResponse.Content);
         }
     }
 }

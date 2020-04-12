@@ -1,41 +1,35 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Hosting;
-using Sports.Alice;
 using Sports.Alice.Tests.TestsInfrastructure;
-using System;
+using Sports.Alice.Tests.TestsInfrastructure.Fixtures;
+using Sports.Common.Tests;
 using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Sports.Alice.Tests.Controllers
 {
-    public class AliceControllerTests
+    [Collection(TestsConstants.ServerCollectionName)]
+    public class AliceControllerTests : BaseTests
     {
         private readonly HttpClient _httpClient;
 
-        public AliceControllerTests()
+        public AliceControllerTests(ServerFixture serverFixture, ITestOutputHelper testOutputHelper)
+            : base(testOutputHelper)
         {
-            var host = Program
-                .CreateHostBuilder(Array.Empty<string>())
-                .ConfigureWebHost(webBuilder =>
-                {
-                    webBuilder.UseTestServer();
-                })
-                .Start();
-            TestServer testServer = host.GetTestServer();
-            _httpClient = testServer.CreateClient();
+            _httpClient = serverFixture.HttpClient;
         }
 
         [Fact]
         public async Task TestWebhook()
         {
             string requestData = File.ReadAllText(TestsConstants.Assets.AliceRequestFilePath);
-            var content = new StringContent(requestData, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync("alice", content);
+            var requestContent = new StringContent(requestData, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("alice", requestContent);
             Assert.True(response.IsSuccessStatusCode, response.ToString());
+            string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            TestOutputHelper.WriteLine(responseContent);
         }
     }
 }

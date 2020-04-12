@@ -16,18 +16,19 @@ namespace Yandex.Alice.Sdk.Converters
             switch (input)
             {
                 case Constants.AliceEntityTypeValues.DateTime:
-                    return AliceEntityType.YANDEX_DATETIME;
+                    return AliceEntityType.DATETIME;
                 case Constants.AliceEntityTypeValues.Fio:
-                    return AliceEntityType.YANDEX_FIO;
+                    return AliceEntityType.FIO;
                 case Constants.AliceEntityTypeValues.Geo:
-                    return AliceEntityType.YANDEX_GEO;
+                    return AliceEntityType.GEO;
                 case Constants.AliceEntityTypeValues.Number:
-                    return AliceEntityType.YANDEX_NUMBER;
+                    return AliceEntityType.NUMBER;
                 default:
                     return AliceEntityType.Unknown;
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "<Pending>")]
         public override void Write(
             Utf8JsonWriter writer,
             AliceEntityType entityType,
@@ -36,16 +37,16 @@ namespace Yandex.Alice.Sdk.Converters
             string result;
             switch (entityType)
             {
-                case AliceEntityType.YANDEX_DATETIME:
+                case AliceEntityType.DATETIME:
                     result = Constants.AliceEntityTypeValues.DateTime;
                     break;
-                case AliceEntityType.YANDEX_FIO:
+                case AliceEntityType.FIO:
                     result = Constants.AliceEntityTypeValues.Fio;
                     break;
-                case AliceEntityType.YANDEX_GEO:
+                case AliceEntityType.GEO:
                     result = Constants.AliceEntityTypeValues.Geo;
                     break;
-                case AliceEntityType.YANDEX_NUMBER:
+                case AliceEntityType.NUMBER:
                     result = Constants.AliceEntityTypeValues.Number;
                     break;
                 default:

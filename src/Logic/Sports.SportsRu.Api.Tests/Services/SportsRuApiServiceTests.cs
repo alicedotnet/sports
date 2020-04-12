@@ -41,7 +41,7 @@ namespace Sports.SportsRu.Api.Tests.Services
         public async Task GetCommentsIds()
         {
             int id = 1084853230; //https://www.sports.ru/football/1084853230.html
-            var commentsIdsResponse = await _sportsRuApiService.GetCommentsIdsAsync(id, MessageClass.News, Sort.Top10);
+            var commentsIdsResponse = await _sportsRuApiService.GetCommentsIdsAsync(id, MessageClass.News, Sort.Top10).ConfigureAwait(false);
             Assert.True(commentsIdsResponse.IsSuccess, commentsIdsResponse.ErrorMessage);
             Assert.NotNull(commentsIdsResponse.Content);
             Assert.NotEmpty(commentsIdsResponse.Content);
@@ -57,7 +57,7 @@ namespace Sports.SportsRu.Api.Tests.Services
         public async Task GetCommentsByIds()
         {
             var commentsIds = new int[] { 1084853975, 1084853842 };//comments ids from https://www.sports.ru/football/1084853230.html
-            var commentsByIdsResponse = await _sportsRuApiService.GetCommentsByIds(commentsIds);
+            var commentsByIdsResponse = await _sportsRuApiService.GetCommentsByIds(commentsIds).ConfigureAwait(false);
             Assert.True(commentsByIdsResponse.IsSuccess, commentsByIdsResponse.ErrorMessage);
             Assert.NotNull(commentsByIdsResponse.Content);
             Assert.NotNull(commentsByIdsResponse.Content.Data);

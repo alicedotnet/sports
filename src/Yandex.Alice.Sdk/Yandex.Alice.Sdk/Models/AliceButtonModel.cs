@@ -14,7 +14,7 @@ namespace Yandex.Alice.Sdk.Models
         public object Payload { get; set; }
 
         [JsonPropertyName("url")]
-        public string Url { get; set; }
+        public Uri Url { get; set; }
 
         [JsonPropertyName("hide")]
         public bool Hide { get; set; }

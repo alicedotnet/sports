@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Yandex.Alice.Sdk.Models;
+using Yandex.Alice.Sdk.Resources;
 
 namespace Yandex.Alice.Sdk.Converters
 {
@@ -23,10 +22,12 @@ namespace Yandex.Alice.Sdk.Converters
                 case "ButtonPressed":
                     return AliceRequestType.ButtonPressed;
                 default:
-                    throw new Exception("Unknown request type");
+                    string message = string.Format(CultureInfo.CurrentCulture, Yandex_Alice_Sdk_Resources.Error_Unknown_Request_Type, input);
+                    throw new Exception(message);
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "<Pending>")]
         public override void Write(
             Utf8JsonWriter writer,
             AliceRequestType requestType,

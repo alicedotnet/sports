@@ -13,6 +13,6 @@ namespace Yandex.Alice.Sdk.Models
 
         [JsonPropertyName("entities")]
         [JsonConverter(typeof(AliceEntityModelConverter))]
-        public List<AliceEntityModel> Entities { get; set; }
+        public AliceEntityModel[] Entities { get; set; }
     }
 }

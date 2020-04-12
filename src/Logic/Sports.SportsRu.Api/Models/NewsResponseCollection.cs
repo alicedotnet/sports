@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Sports.SportsRu.Api.Models
 {
-    public class CommentIdsResponse : List<int>
+    public class NewsResponseCollection : List<NewsArticleInfo>
     {
     }
 }

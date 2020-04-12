@@ -1,4 +1,5 @@
-﻿using Sports.Common.Models;
+﻿using Sports.Common.Factories;
+using Sports.Common.Models;
 using Sports.SportsRu.Api.Helpers;
 using Sports.SportsRu.Api.Models;
 using Sports.SportsRu.Api.Services.Interfaces;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Sports.SportsRu.Api.Services
 {
-    public class SportsRuApiService : ISportsRuApiService
+    public class SportsRuApiService : ISportsRuApiService, IDisposable
     {
         private readonly HttpClient _httpClient;
 
@@ -24,7 +25,7 @@ namespace Sports.SportsRu.Api.Services
             };
         }
 
-        public async Task<ServiceResponse<NewsResponse>> GetNewsAsync(NewsType newsType, NewsPriority newsPriority, NewsContentOrigin newsContentOrigin, int count)
+        public async Task<ServiceResponse<NewsResponseCollection>> GetNewsAsync(NewsType newsType, NewsPriority newsPriority, NewsContentOrigin newsContentOrigin, int count)
         {
             var newsRequest = new NewsRequest()
             {
@@ -54,13 +55,13 @@ namespace Sports.SportsRu.Api.Services
             string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {                
-                var newsResponse = JsonSerializer.Deserialize<NewsResponse>(content);
-                return ServiceResponse<NewsResponse>.Success(newsResponse);
+                var newsResponse = JsonSerializer.Deserialize<NewsResponseCollection>(content);
+                return ServiceResponseFactory.Success(newsResponse);
             }
-            return ServiceResponse<NewsResponse>.Error(content);
+            return ServiceResponseFactory.Error<NewsResponseCollection>(content);
         }
 
-        public async Task<ServiceResponse<CommentIdsResponse>> GetCommentsIdsAsync(int messageId, MessageClass messageClass, Sort sort)
+        public async Task<ServiceResponse<CommentIdsResponseCollection>> GetCommentsIdsAsync(int messageId, MessageClass messageClass, Sort sort)
         {
             var commentsIdsRequest = new CommentIdsRequest()
             {
@@ -84,10 +85,10 @@ namespace Sports.SportsRu.Api.Services
             string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
-                var commentIdsResponse = JsonSerializer.Deserialize<CommentIdsResponse>(content);
-                return ServiceResponse<CommentIdsResponse>.Success(commentIdsResponse);
+                var commentIdsResponse = JsonSerializer.Deserialize<CommentIdsResponseCollection>(content);
+                return ServiceResponseFactory.Success(commentIdsResponse);
             }
-            return ServiceResponse<CommentIdsResponse>.Error(content);
+            return ServiceResponseFactory.Error<CommentIdsResponseCollection>(content);
         }
 
         public async Task<ServiceResponse<CommentByIdsResponse>> GetCommentsByIds(IEnumerable<int> ids)
@@ -98,9 +99,40 @@ namespace Sports.SportsRu.Api.Services
             if (response.IsSuccessStatusCode)
             {
                 var commentsByIdsResponse = JsonSerializer.Deserialize<CommentByIdsResponse>(content);
-                return ServiceResponse<CommentByIdsResponse>.Success(commentsByIdsResponse);
+                return ServiceResponseFactory.Success(commentsByIdsResponse);
             }
-            return ServiceResponse<CommentByIdsResponse>.Error(content);
+            return ServiceResponseFactory.Error<CommentByIdsResponse>(content);
         }
+
+        #region IDisposable Support
+        private bool _disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _httpClient.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        // ~SportsRuApiService()
+        // {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>22ccce4a-3de4-453f-89cb-80b77fad49f0</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="4.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Yandex.Alice.Sdk\Yandex.Alice.Sdk\Yandex.Alice.Sdk.csproj" />
+  </ItemGroup>
+
+
+</Project>

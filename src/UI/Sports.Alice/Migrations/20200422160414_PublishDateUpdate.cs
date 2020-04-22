@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Sports.Alice.Migrations
 {
-    public partial class Initial : Migration
+    public partial class PublishDateUpdate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,7 +13,7 @@ namespace Sports.Alice.Migrations
                 {
                     NewsArticleId = table.Column<Guid>(nullable: false),
                     Title = table.Column<string>(nullable: true),
-                    PublishedDate = table.Column<DateTimeOffset>(nullable: true),
+                    PublishedDate = table.Column<DateTime>(nullable: true),
                     ExternalId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>

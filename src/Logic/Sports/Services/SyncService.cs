@@ -37,7 +37,9 @@ namespace Sports.Services
                         {
                             ExternalId = idString,
                             Title = item.Title,
-                            PublishedDate = DateTimeOffset.FromUnixTimeSeconds(item.Published.Timestamp)
+                            PublishedDate = DateTimeOffset
+                                .FromUnixTimeSeconds(item.Published.Timestamp)
+                                .UtcDateTime
                         });
                     }
                 }

@@ -25,7 +25,7 @@ namespace Sports.Alice.Migrations
                     b.Property<string>("ExternalId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset?>("PublishedDate")
+                    b.Property<DateTime?>("PublishedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")

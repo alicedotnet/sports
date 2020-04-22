@@ -1,5 +1,6 @@
 ﻿using Sports.Data.Context;
 using Sports.Data.Entities;
+using Sports.Models;
 using Sports.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,13 @@ namespace Sports.Services
             _sportsContext = sportsContext;
         }
 
-        
+        public IEnumerable<NewsArticleModel> GetLatestNews(int newsCount)
+        {
+            return _sportsContext.NewsArticles
+                .OrderByDescending(x => x.PublishedDate)
+                .Take(newsCount)
+                .Select(x => new NewsArticleModel() { Title = x.Title})
+                .ToArray();
+        }
     }
 }

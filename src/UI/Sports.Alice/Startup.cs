@@ -39,6 +39,7 @@ namespace Sports.Alice
             services.AddTransient<IAliceService, AliceService>();
             services.AddScoped<ISyncService, SyncService>();
             services.AddScoped<ISportsRuApiService, SportsRuApiService>();
+            services.AddScoped<INewsService, NewsService>();
 
             string connectionString = Configuration.GetConnectionString("database");
             string assemblyName = this.GetType().Assembly.GetName().Name;

@@ -8,7 +8,7 @@ namespace Sports.Data.Entities
     {
         public Guid NewsArticleId { get; set; }
         public string Title { get; set; }
-        public DateTimeOffset? PublishedDate { get; set; }
+        public DateTime? PublishedDate { get; set; }
         public string ExternalId { get; set; }
     }
 }

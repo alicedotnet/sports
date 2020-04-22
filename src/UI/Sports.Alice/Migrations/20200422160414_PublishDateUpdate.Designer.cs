@@ -9,8 +9,8 @@ using Sports.Data.Context;
 namespace Sports.Alice.Migrations
 {
     [DbContext(typeof(SportsContext))]
-    [Migration("20200422135545_Initial")]
-    partial class Initial
+    [Migration("20200422160414_PublishDateUpdate")]
+    partial class PublishDateUpdate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,7 +27,7 @@ namespace Sports.Alice.Migrations
                     b.Property<string>("ExternalId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset?>("PublishedDate")
+                    b.Property<DateTime?>("PublishedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")

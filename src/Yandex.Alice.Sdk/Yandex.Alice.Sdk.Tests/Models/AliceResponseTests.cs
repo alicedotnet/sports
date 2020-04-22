@@ -18,17 +18,24 @@ namespace Yandex.Alice.Sdk.Tests.Models
         }
 
         [Fact]
-        public void Deserialize_Ok()
+        public void AliceResponse()
         {
             string json = File.ReadAllText(TestsConstants.Assets.AliceResponseFilePath);
             var aliceResponse = JsonSerializer.Deserialize<AliceResponse>(json);
             Assert.NotNull(aliceResponse);
+            Assert.NotEmpty(aliceResponse.Version);
             Assert.NotNull(aliceResponse.Response);
+            Assert.NotEmpty(aliceResponse.Response.Text);
+            Assert.NotEmpty(aliceResponse.Response.Tts);
+            Assert.True(aliceResponse.Response.EndSession);
             Assert.NotNull(aliceResponse.Response.Buttons);
             Assert.NotEmpty(aliceResponse.Response.Buttons);
             foreach (var button in aliceResponse.Response.Buttons)
             {
+                Assert.NotEmpty(button.Title);
+                Assert.NotNull(button.Payload);
                 Assert.NotNull(button.Url);
+                Assert.True(button.Hide);
             }
             WritePrettyJson(aliceResponse);
         }

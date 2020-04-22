@@ -21,6 +21,14 @@ namespace Sports.Alice
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureLogging((ctx, logging) => {
+                    //workaround for serilog
+                    Environment.CurrentDirectory = ctx.HostingEnvironment.ContentRootPath;
+                    var configuration = ctx.Configuration.GetSection("Logging");
+                    logging.AddConfiguration(configuration);
+                    logging.AddFile(configuration);
+                    logging.AddConsole();
                 });
     }
 }

@@ -36,7 +36,8 @@ namespace Sports.Services
                         _sportsContext.NewsArticles.Add(new NewsArticle()
                         {
                             ExternalId = idString,
-                            Title = item.Title
+                            Title = item.Title,
+                            PublishedDate = DateTimeOffset.FromUnixTimeSeconds(item.Published.Timestamp)
                         });
                     }
                 }

@@ -33,6 +33,8 @@ namespace Sports.SportsRu.Api.Tests.Services
             {
                 Assert.NotNull(item.Title);
                 Assert.NotEqual(0, item.Id);
+                Assert.NotNull(item.Published);
+                Assert.NotEqual(0, item.Published.Timestamp);
             }
             WritePrettyJson(newsResponse.Content);
         }

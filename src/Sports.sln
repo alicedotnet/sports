@@ -29,13 +29,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yandex.Alice.Sdk.Tests", "Y
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{88AFAF2B-E2A6-4F79-A56B-5FCCC0628553}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sports.Data", "Data\Sports.Data\Sports.Data.csproj", "{729D6B44-B64D-4B86-9528-BF8BCB9B8538}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sports.Data", "Data\Sports.Data\Sports.Data.csproj", "{729D6B44-B64D-4B86-9528-BF8BCB9B8538}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sports.Data.Tests", "Data\Sports.Data.Tests\Sports.Data.Tests.csproj", "{945EFFCC-9FD0-4C1E-8E55-309C529EB5BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sports.Data.Tests", "Data\Sports.Data.Tests\Sports.Data.Tests.csproj", "{945EFFCC-9FD0-4C1E-8E55-309C529EB5BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sports", "Logic\Sports\Sports.csproj", "{ABC2E2F6-2DA2-41D1-92BD-856A1DB8FD83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sports", "Logic\Sports\Sports.csproj", "{ABC2E2F6-2DA2-41D1-92BD-856A1DB8FD83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sports.Tests", "Logic\Sports.Tests\Sports.Tests.csproj", "{5061740F-35AC-481E-883F-3B8118ECF7E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sports.Tests", "Logic\Sports.Tests\Sports.Tests.csproj", "{5061740F-35AC-481E-883F-3B8118ECF7E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

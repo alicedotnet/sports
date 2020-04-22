@@ -11,5 +11,13 @@ namespace Sports.SportsRu.Api.Models
         public string Title { get; set; }
         [JsonPropertyName("id")]
         public int Id { get; set; }
+        [JsonPropertyName("published")]
+        public NewsArticlePublished Published { get; set; }
+    }
+
+    public class NewsArticlePublished
+    {
+        [JsonPropertyName("timestamp")]
+        public long Timestamp { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Sports.Data.Context;
+﻿using Sports.Common.Tests;
+using Sports.Data.Context;
 using Sports.Services.Interfaces;
 using Sports.Tests.TestsInfrastructure;
 using Sports.Tests.TestsInfrastructure.Fixtures;
@@ -8,16 +9,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Sports.Tests.Services
 {
     [Collection(TestsConstants.SportsCollectionName)]
-    public class SyncServiceTests
+    public class SyncServiceTests : BaseTests
     {
         private readonly ISyncService _syncService;
         private readonly SportsContext _sportsContext;
 
-        public SyncServiceTests(SportsFixture sportsFixture)
+        public SyncServiceTests(SportsFixture sportsFixture, ITestOutputHelper testOutputHelper)
+            : base(testOutputHelper)
         {
             _syncService = sportsFixture.SyncService;
             _sportsContext = sportsFixture.SportsContext;
@@ -28,6 +31,11 @@ namespace Sports.Tests.Services
         {
             await _syncService.SyncAllAsync().ConfigureAwait(false);
             Assert.True(_sportsContext.NewsArticles.Any());
+            var article = _sportsContext.NewsArticles.First();
+            Assert.NotNull(article.ExternalId);
+            Assert.NotNull(article.PublishedDate);
+
+            WritePrettyJson(article);
         }
     }
 }

@@ -16,6 +16,11 @@ namespace Sports.Alice.Services
                 throw new ArgumentNullException(nameof(aliceRequest));
             }
 
+            if(aliceRequest.Request.Nlu.Tokens.Contains("новости"))
+            {
+
+            }
+
             return new AliceResponse()
             {
                 Session = aliceRequest.Session,

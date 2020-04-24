@@ -50,6 +50,7 @@ namespace Sports.Alice
                 .UseSqlite(connectionString, b => b.MigrationsAssembly(assemblyName)));
 
             services.AddHostedService<SyncWorker>();
+            services.AddHostedService<CleanWorker>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -8,5 +8,6 @@ namespace Sports.Services.Interfaces
     public interface ISyncService
     {
         Task SyncAllAsync();
+        void DeleteOldData(DateTimeOffset oldestDateToKeep);
     }
 }

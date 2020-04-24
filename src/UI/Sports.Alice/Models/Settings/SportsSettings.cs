@@ -8,5 +8,6 @@ namespace Sports.Alice.Models.Settings
     public class SportsSettings
     {
         public int NewsToDisplay { get; set; }
+        public int DaysToKeepData { get; set; }
     }
 }

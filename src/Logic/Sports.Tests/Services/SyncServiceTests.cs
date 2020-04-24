@@ -1,5 +1,6 @@
 ﻿using Sports.Common.Tests;
 using Sports.Data.Context;
+using Sports.Data.Entities;
 using Sports.Services.Interfaces;
 using Sports.Tests.TestsInfrastructure;
 using Sports.Tests.TestsInfrastructure.Fixtures;
@@ -36,6 +37,18 @@ namespace Sports.Tests.Services
             Assert.NotNull(article.PublishedDate);
 
             WritePrettyJson(article);
+        }
+
+        [Fact]
+        public void DeleteAfterDate()
+        {
+            Assert.False(_sportsContext.NewsArticles.Any());
+            _sportsContext.NewsArticles.Add(new NewsArticle() 
+                { Title = "test", PublishedDate = DateTime.Now.AddDays(-1) });
+            _sportsContext.SaveChanges();
+            Assert.True(_sportsContext.NewsArticles.Any());
+            _syncService.DeleteOldData(DateTimeOffset.Now);
+            Assert.False(_sportsContext.NewsArticles.Any());
         }
     }
 }

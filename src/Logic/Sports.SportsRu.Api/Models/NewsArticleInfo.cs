@@ -11,6 +11,8 @@ namespace Sports.SportsRu.Api.Models
         public string Title { get; set; }
         [JsonPropertyName("id")]
         public int Id { get; set; }
+        [JsonPropertyName("body_is_empty")]
+        public bool BodyIsEmpty { get; set; }
         [JsonPropertyName("published")]
         public NewsArticlePublished Published { get; set; }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Sports.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -9,34 +10,29 @@ using System.Threading.Tasks;
 
 namespace Sports.Alice.Workers
 {
-    public class SyncWorker : BackgroundService
+    public class SyncWorker : Worker
     {
-        private readonly IServiceProvider _serviceProvider;
-        private Timer _timer;
-        private const int _secondsInterval = 60;
+        protected override TimeSpan TimerInterval { get; }
 
         public SyncWorker(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
-            _serviceProvider = serviceProvider;
-        }
+            TimerInterval = TimeSpan.FromSeconds(60);
+        }        
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async void DoWork(object state)
         {
-            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(_secondsInterval));
-            return Task.CompletedTask;
-        }
-
-        public override Task StopAsync(CancellationToken cancellationToken)
-        {
-            _timer?.Change(Timeout.Infinite, 0);
-            return base.StopAsync(cancellationToken);
-        }
-
-        private async void DoWork(object state)
-        {
-            using var scope = _serviceProvider.CreateScope();
-            var syncService = scope.ServiceProvider.GetRequiredService<ISyncService>();
-            await syncService.SyncAllAsync().ConfigureAwait(false);
+            using var scope = ServiceProvider.CreateScope();
+            try
+            {
+                var syncService = scope.ServiceProvider.GetRequiredService<ISyncService>();
+                await syncService.SyncAllAsync().ConfigureAwait(false);
+            }
+            catch(Exception e)
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<SyncWorker>>();
+                logger.LogError(e, string.Empty);
+            }
         }
     }
 }

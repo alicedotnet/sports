@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Sports.Alice.Models.Settings;
 using Sports.Alice.Services;
 using Sports.Alice.Services.Interfaces;
 using Sports.Alice.Workers;
@@ -36,10 +37,12 @@ namespace Sports.Alice
         {
             services.AddControllers();
 
-            services.AddTransient<IAliceService, AliceService>();
+            services.AddScoped<IAliceService, AliceService>();
             services.AddScoped<ISyncService, SyncService>();
             services.AddScoped<ISportsRuApiService, SportsRuApiService>();
             services.AddScoped<INewsService, NewsService>();
+
+            services.Configure<SportsSettings>(Configuration.GetSection("SportsSettings"));
 
             string connectionString = Configuration.GetConnectionString("database");
             string assemblyName = this.GetType().Assembly.GetName().Name;

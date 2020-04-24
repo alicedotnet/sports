@@ -29,15 +29,16 @@ namespace Sports.SportsRu.Api.Tests.Services
             Assert.True(newsResponse.IsSuccess, newsResponse.ErrorMessage);
             Assert.NotNull(newsResponse.Content);
             Assert.NotEmpty(newsResponse.Content);
-            foreach (var item in newsResponse.Content)
+            foreach (var newsArticle in newsResponse.Content)
             {
-                Assert.NotNull(item.Title);
-                Assert.NotEqual(0, item.Id);
-                Assert.NotNull(item.Published);
-                Assert.NotEqual(0, item.Published.Timestamp);
-                if(item.ContentOption != null)
+                Assert.NotNull(newsArticle.Title);
+                Assert.NotNull(newsArticle.DesktopUrl);
+                Assert.NotEqual(0, newsArticle.Id);
+                Assert.NotNull(newsArticle.Published);
+                Assert.NotEqual(0, newsArticle.Published.Timestamp);
+                if(newsArticle.ContentOption != null)
                 {
-                    Assert.NotEmpty(item.ContentOption.Name);
+                    Assert.NotEmpty(newsArticle.ContentOption.Name);
                 }
             }
             WritePrettyJson(newsResponse.Content);

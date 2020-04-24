@@ -48,8 +48,9 @@ namespace Sports.Alice.Tests.Services
                 }
             };
             var aliceResponse = _aliceService.ProcessRequest(aliceRequest);
-            TestOutputHelper.WriteLine($"Response text: {aliceResponse.Response.Text}");
-            var news = aliceResponse.Response.Text.Split("\n\n");
+            var aliceGalleryResponse = aliceResponse as AliceGalleryResponse;
+            TestOutputHelper.WriteLine($"Response text: {aliceGalleryResponse.Response.Text}");
+            var news = aliceGalleryResponse.Response.Text.Split("\n\n");
             Assert.Equal(_sportsSettings.NewsToDisplay, news.Length);
         }
 

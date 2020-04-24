@@ -18,6 +18,6 @@ namespace Yandex.Alice.Sdk.Models
         public bool EndSession { get; set; }
 
         [JsonPropertyName("buttons")]
-        public AliceButtonModel[] Buttons { get; set; }
+        public List<AliceButtonModel> Buttons { get; set; }
     }
 }

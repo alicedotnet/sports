@@ -5,7 +5,6 @@ using Sports.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Yandex.Alice.Sdk.Models;
 
 namespace Sports.Alice.Services
@@ -26,15 +25,20 @@ namespace Sports.Alice.Services
             _sportsSettings = sportsSettings.Value;
         }
 
-        public AliceResponse ProcessRequest(AliceRequest aliceRequest)
+        public AliceResponseBase ProcessRequest(AliceRequest aliceRequest)
         {
             if(aliceRequest == null)
             {
                 throw new ArgumentNullException(nameof(aliceRequest));
             }
 
-            string text;
-            string tts;
+            var buttons = new List<AliceButtonModel>()
+            {
+                new AliceButtonModel()
+                {
+                    Title = "последние новости"
+                }
+            };
             if (aliceRequest.Session.New || 
                 aliceRequest.Request.Nlu.Tokens.Contains("новости") ||
                 aliceRequest.Request.Nlu.Tokens.Contains("расскажи"))
@@ -43,28 +47,33 @@ namespace Sports.Alice.Services
                 if (news.Any())
                 {
                     var titles = news.Select(x => x.Title);
-                    text = string.Join("\n\n", titles);
-                    tts = string.Join(". ", titles);
+                    string text = "Вот последние новости\n\n" + string.Join("\n\n", titles);
+                    string tts = "Вот последние новости. " + string.Join(". ", titles);
+                    var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
+                    response.Response.Card.Items = new List<AliceGalleryCardItem>();
+                    response.Response.Card.Header = new AliceGalleryCardHeaderModel("Последние новости");
+                    foreach (var newsArticle in news)
+                    {
+                        response.Response.Card.Items.Add(new AliceGalleryCardItem()
+                        {
+                            Title = newsArticle.Title,
+                            Button = new AliceImageCardButtonModel()
+                            {
+                                Url = newsArticle.Url
+                            }
+                        });
+                    }
+                    return response;
                 }
                 else
                 {
-                    text = tts = "У меня нет новостей";
+                    return new AliceResponse(aliceRequest, "У меня нет новостей", buttons);
                 }
             }
             else
             {
-                text = tts = "Вы можете попросить меня прочитать последние новости спорта сказав фразу: расскажи новости";
+                return new AliceResponse(aliceRequest, "Вы можете попросить меня прочитать последние новости спорта сказав фразу: расскажи новости", buttons);
             }
-
-            return new AliceResponse()
-            {
-                Version = aliceRequest.Version,
-                Response = new AliceResponseModel()
-                {
-                    Text = text,
-                    Tts = tts
-                }
-            };
         }
     }
 }

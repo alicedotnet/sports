@@ -7,5 +7,6 @@ namespace Sports.Models
     public class NewsArticleModel
     {
         public string Title { get; set; }
+        public Uri Url { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace Sports.Alice.Services.Interfaces
 {
     public interface IAliceService
     {
-        AliceResponse ProcessRequest(AliceRequest aliceRequest);
+        AliceResponseBase ProcessRequest(AliceRequest aliceRequest);
     }
 }

@@ -18,5 +18,15 @@ namespace Yandex.Alice.Sdk.Models
 
         [JsonPropertyName("hide")]
         public bool Hide { get; set; }
+
+        public AliceButtonModel()
+        {
+            Payload = new object();
+        }
+
+        public AliceButtonModel(string title)
+        {
+            Title = title;
+        }
     }
 }

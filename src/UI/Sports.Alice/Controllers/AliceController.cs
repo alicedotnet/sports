@@ -15,9 +15,10 @@ namespace Sports.Alice.Controllers
         }
 
         [HttpPost("/alice")]
-        public AliceResponse WebHook([FromBody] AliceRequest request)
+        public IActionResult WebHook([FromBody] AliceRequest request)
         {
-            return _aliceService.ProcessRequest(request);
+            var response = _aliceService.ProcessRequest(request);
+            return Ok(response);
         }
     }
 }

@@ -23,7 +23,11 @@ namespace Sports.Services
             return _sportsContext.NewsArticles
                 .OrderByDescending(x => x.PublishedDate)
                 .Take(newsCount)
-                .Select(x => new NewsArticleModel() { Title = x.Title})
+                .Select(x => new NewsArticleModel() 
+                { 
+                    Title = x.Title,
+                    Url = x.Url
+                })
                 .ToArray();
         }
     }

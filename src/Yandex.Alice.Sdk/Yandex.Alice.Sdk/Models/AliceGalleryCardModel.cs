@@ -14,7 +14,7 @@ namespace Yandex.Alice.Sdk.Models
         [JsonPropertyName("header")]
         public AliceGalleryCardHeaderModel Header { get; set; }
         [JsonPropertyName("items")]
-        public AliceGalleryCardItem[] Items { get; set; }
+        public List<AliceGalleryCardItem> Items { get; set; }
         [JsonPropertyName("footer")]
         public AliceGalleryCardFooterModel Footer { get; set; }
     }

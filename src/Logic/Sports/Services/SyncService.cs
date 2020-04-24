@@ -42,6 +42,7 @@ namespace Sports.Services
                         {
                             ExternalId = idString,
                             Title = newsArticle.Title,
+                            Url = newsArticle.DesktopUrl,
                             PublishedDate = DateTimeOffset
                                 .FromUnixTimeSeconds(newsArticle.Published.Timestamp)
                                 .UtcDateTime

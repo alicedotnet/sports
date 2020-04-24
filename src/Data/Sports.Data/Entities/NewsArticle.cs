@@ -9,6 +9,7 @@ namespace Sports.Data.Entities
         public Guid NewsArticleId { get; set; }
         public string Title { get; set; }
         public DateTime? PublishedDate { get; set; }
+        public Uri Url { get; set; }
         public string ExternalId { get; set; }
     }
 }

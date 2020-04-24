@@ -14,7 +14,7 @@ namespace Yandex.Alice.Sdk.Models
         [JsonPropertyName("card")]
         public AliceGalleryCardModel Card { get; set; }
         [JsonPropertyName("buttons")]
-        public AliceButtonModel[] Buttons { get; set; }
+        public List<AliceButtonModel> Buttons { get; set; }
         [JsonPropertyName("end_session")]
         public bool EndSession { get; set; }
     }

@@ -13,6 +13,8 @@ namespace Sports.SportsRu.Api.Models
         public int Id { get; set; }
         [JsonPropertyName("body_is_empty")]
         public bool BodyIsEmpty { get; set; }
+        [JsonPropertyName("desktop_url")]
+        public Uri DesktopUrl { get; set; }
         [JsonPropertyName("content_option")]
         public ContentOption ContentOption { get; set; }
         [JsonPropertyName("published")]

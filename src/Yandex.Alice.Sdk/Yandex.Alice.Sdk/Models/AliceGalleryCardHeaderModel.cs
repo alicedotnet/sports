@@ -9,5 +9,15 @@ namespace Yandex.Alice.Sdk.Models
     {
         [JsonPropertyName("text")]
         public string Text { get; set; }
+
+        public AliceGalleryCardHeaderModel()
+        {
+
+        }
+
+        public AliceGalleryCardHeaderModel(string text)
+        {
+            Text = text;
+        }
     }
 }

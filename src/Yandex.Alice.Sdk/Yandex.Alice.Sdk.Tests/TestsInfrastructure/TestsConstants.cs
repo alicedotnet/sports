@@ -11,6 +11,7 @@ namespace Yandex.Alice.Sdk.Tests.TestsInfrastructure
             private const string _assetsFolderPath = "TestsInfrastructure/Assets";
             public static readonly string AliceRequestFilePath = $"{_assetsFolderPath}/AliceRequest.json";
             public static readonly string AliceResponseFilePath = $"{_assetsFolderPath}/AliceResponse.json";
+            public static readonly string AliceImageResponseFilePath = $"{_assetsFolderPath}/AliceImageResponse.json";
         }
     }
 }

@@ -18,5 +18,11 @@ namespace Yandex.Alice.Sdk
             public const string Geo = "YANDEX.GEO";
             public const string Number = "YANDEX.NUMBER";
         }
+
+        public static class AliceCardTypeValues
+        {
+            public const string BigImage = "BigImage";
+            public const string ItemsList = "ItemsList";
+        }
     }
 }

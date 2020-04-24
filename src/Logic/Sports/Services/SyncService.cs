@@ -30,7 +30,8 @@ namespace Sports.Services
             {
                 foreach (var newsArticle in newsResponse.Content)
                 {
-                    if(newsArticle.BodyIsEmpty) //usually this is not a news article but some promotion
+                    if(newsArticle.BodyIsEmpty ||
+                        newsArticle.ContentOption?.Name == "special") //usually this is not a news article but some promotion
                     {
                         continue;
                     }

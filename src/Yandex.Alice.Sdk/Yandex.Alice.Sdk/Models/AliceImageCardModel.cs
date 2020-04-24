@@ -6,7 +6,7 @@ using Yandex.Alice.Sdk.Converters;
 
 namespace Yandex.Alice.Sdk.Models
 {
-    public class AliceImageCard
+    public class AliceImageCardModel
     {
         [JsonPropertyName("type")]
         [JsonConverter(typeof(AliceCardTypeConverter))]
@@ -18,6 +18,6 @@ namespace Yandex.Alice.Sdk.Models
         [JsonPropertyName("description")]
         public string Description { get; set; }
         [JsonPropertyName("button")]
-        public AliceImageCardButton Button { get; set; }
+        public AliceImageCardButtonModel Button { get; set; }
     }
 }

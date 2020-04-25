@@ -5,6 +5,7 @@ using Sports.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Yandex.Alice.Sdk.Helpers;
 using Yandex.Alice.Sdk.Models;
 
 namespace Sports.Alice.Services
@@ -56,7 +57,7 @@ namespace Sports.Alice.Services
                     {
                         response.Response.Card.Items.Add(new AliceGalleryCardItem()
                         {
-                            Title = newsArticle.Title,
+                            Title = AliceHelper.PrepareGalleryCardItemTitle(newsArticle.Title),
                             Button = new AliceImageCardButtonModel()
                             {
                                 Url = newsArticle.Url

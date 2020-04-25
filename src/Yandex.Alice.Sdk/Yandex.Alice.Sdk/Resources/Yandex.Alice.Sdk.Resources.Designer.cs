@@ -61,6 +61,15 @@ namespace Yandex.Alice.Sdk.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to String lenght exceeds {0} symbols. Use {1} to reduce string length.
+        /// </summary>
+        internal static string Error_TooLongString {
+            get {
+                return ResourceManager.GetString("Error_TooLongString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Request type &apos;{0}&apos; is unknown.
         /// </summary>
         internal static string Error_Unknown_Request_Type {

@@ -78,5 +78,15 @@ namespace Sports.SportsRu.Api.Tests.Services
             }
             WritePrettyJson(commentsByIdsResponse.Content);
         }
+
+        [Fact]
+        public async Task GetHotContent()
+        {
+            var hotContentResponse = await _sportsRuApiService.GetHotContent().ConfigureAwait(false);
+            Assert.True(hotContentResponse.IsSuccess);
+            Assert.NotNull(hotContentResponse.Content.News);
+            Assert.NotEmpty(hotContentResponse.Content.News);
+            WritePrettyJson(hotContentResponse.Content);
+        }
     }
 }

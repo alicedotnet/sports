@@ -1,0 +1,130 @@
+{
+	"info": {
+		"_postman_id": "28712518-2171-438a-aafa-14f360be66db",
+		"name": "sports.ru",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "main news from homepage",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://www.sports.ru/core/news/list?args=%7B%0A%20%20%20%20%22filter%22%20%3A%20%7B%0A%20%20%20%20%20%20%20%20%22type%22%20%3A%20%22homepage%22%2C%0A%20%20%20%20%20%20%20%20%22news_type%22%20%3A%20%22main%22%2C%0A%20%20%20%20%20%20%20%20%22content_origin%22%20%3A%20%22editorial%22%0A%20%20%20%20%7D%2C%0A%20%20%20%20%22count%22%3A%20100%0A%7D",
+					"protocol": "https",
+					"host": [
+						"www",
+						"sports",
+						"ru"
+					],
+					"path": [
+						"core",
+						"news",
+						"list"
+					],
+					"query": [
+						{
+							"key": "args",
+							"value": "%7B%0A%20%20%20%20%22filter%22%20%3A%20%7B%0A%20%20%20%20%20%20%20%20%22type%22%20%3A%20%22homepage%22%2C%0A%20%20%20%20%20%20%20%20%22news_type%22%20%3A%20%22main%22%2C%0A%20%20%20%20%20%20%20%20%22content_origin%22%20%3A%20%22editorial%22%0A%20%20%20%20%7D%2C%0A%20%20%20%20%22count%22%3A%20100%0A%7D"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get comment ids",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://www.sports.ru/core/api/comment/get_ids/?args=%7B%22message_id%22%3A1084853230%2C%22message_class%22%3A%22Sports%3A%3ANews%22%2C%22sort%22%3A%22top10%22%7D",
+					"protocol": "https",
+					"host": [
+						"www",
+						"sports",
+						"ru"
+					],
+					"path": [
+						"core",
+						"api",
+						"comment",
+						"get_ids",
+						""
+					],
+					"query": [
+						{
+							"key": "args",
+							"value": "%7B%22message_id%22%3A1084853230%2C%22message_class%22%3A%22Sports%3A%3ANews%22%2C%22sort%22%3A%22top10%22%7D"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get comments by ids",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://www.sports.ru/api/comment/get/by_ids.json?comment_ids=1084833027%2C1084834929%2C1084847627%2C1084833047%2C1084838415%2C1084852858%2C1084833206%2C1084845634%2C1084847129%2C1084833701%2C1084833948%2C1084833443%2C1084834147%2C1084834499%2C1084834545%2C1084841556%2C1084833765%2C1084833870%2C1084834739%2C1084841318%2C1084833960%2C1084839722%2C1084839218%2C1084853020%2C1084853120%2C1084833711%2C1084834482%2C1084838977%2C1084833900%2C1084833819%2C1084850852%2C1084852937%2C1084853015%2C1084833028%2C1084835912%2C1084837064%2C1084853606%2C1084852910%2C1084852829%2C1084836956%2C1084854212%2C1084853996%2C1084852666%2C1084834421&style=newjs",
+					"protocol": "https",
+					"host": [
+						"www",
+						"sports",
+						"ru"
+					],
+					"path": [
+						"api",
+						"comment",
+						"get",
+						"by_ids.json"
+					],
+					"query": [
+						{
+							"key": "comment_ids",
+							"value": "1084833027%2C1084834929%2C1084847627%2C1084833047%2C1084838415%2C1084852858%2C1084833206%2C1084845634%2C1084847129%2C1084833701%2C1084833948%2C1084833443%2C1084834147%2C1084834499%2C1084834545%2C1084841556%2C1084833765%2C1084833870%2C1084834739%2C1084841318%2C1084833960%2C1084839722%2C1084839218%2C1084853020%2C1084853120%2C1084833711%2C1084834482%2C1084838977%2C1084833900%2C1084833819%2C1084850852%2C1084852937%2C1084853015%2C1084833028%2C1084835912%2C1084837064%2C1084853606%2C1084852910%2C1084852829%2C1084836956%2C1084854212%2C1084853996%2C1084852666%2C1084834421"
+						},
+						{
+							"key": "style",
+							"value": "newjs"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get hot content",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://stat.sports.ru/api/ru/hot_content/?metod_id=1",
+					"protocol": "https",
+					"host": [
+						"stat",
+						"sports",
+						"ru"
+					],
+					"path": [
+						"api",
+						"ru",
+						"hot_content",
+						""
+					],
+					"query": [
+						{
+							"key": "metod_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

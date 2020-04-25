@@ -16,12 +16,17 @@ namespace Sports.SportsRu.Api.Services
     public class SportsRuApiService : ISportsRuApiService, IDisposable
     {
         private readonly HttpClient _httpClient;
+        private readonly HttpClient _statHttpClient;
 
         public SportsRuApiService()
         {
             _httpClient = new HttpClient
             {
                 BaseAddress = new Uri("https://www.sports.ru")
+            };
+            _statHttpClient = new HttpClient()
+            {
+                BaseAddress = new Uri("https://stat.sports.ru")
             };
         }
 
@@ -102,6 +107,18 @@ namespace Sports.SportsRu.Api.Services
                 return ServiceResponseFactory.Success(commentsByIdsResponse);
             }
             return ServiceResponseFactory.Error<CommentByIdsResponse>(content);
+        }
+
+        public async Task<ServiceResponse<HotContentResponse>> GetHotContent()
+        {
+            var response = await _statHttpClient.GetAsync("api/ru/hot_content/?metod_id=1").ConfigureAwait(false);
+            string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            if(response.IsSuccessStatusCode)
+            {
+                var hotContent = JsonSerializer.Deserialize<HotContentResponse>(content);
+                return ServiceResponseFactory.Success(hotContent);
+            }
+            return ServiceResponseFactory.Error<HotContentResponse>(content);
         }
 
         #region IDisposable Support

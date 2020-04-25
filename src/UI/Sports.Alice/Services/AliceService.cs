@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
+using Sports.Alice.Models;
 using Sports.Alice.Models.Settings;
 using Sports.Alice.Services.Interfaces;
+using Sports.Models;
 using Sports.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,7 +23,6 @@ namespace Sports.Alice.Services
             {
                 throw new ArgumentNullException(nameof(sportsSettings));
             }
-
             _newsService = newsService;
             _sportsSettings = sportsSettings.Value;
         }
@@ -57,7 +58,8 @@ namespace Sports.Alice.Services
                     {
                         response.Response.Card.Items.Add(new AliceGalleryCardItem()
                         {
-                            Title = AliceHelper.PrepareGalleryCardItemTitle(newsArticle.Title),
+                            Title = AliceHelper
+                                .PrepareGalleryCardItemTitle(newsArticle.Title, GetTitleEnding(newsArticle), AliceHelper.DefaultReducedStringEnding),
                             Button = new AliceImageCardButtonModel()
                             {
                                 Url = newsArticle.Url
@@ -75,6 +77,13 @@ namespace Sports.Alice.Services
             {
                 return new AliceResponse(aliceRequest, "Вы можете попросить меня прочитать последние новости спорта сказав фразу: расскажи новости", buttons);
             }
+        }
+
+        private string GetTitleEnding(NewsArticleModel newsArticle)
+        {
+            return newsArticle.IsHotContent ? $" {EmojiLibrary.FireEmoji} {newsArticle.CommentsCount}"
+                : newsArticle.CommentsCount > 0 ? $" {EmojiLibrary.SpeechBalloon} {newsArticle.CommentsCount} "
+                    : string.Empty;
         }
     }
 }

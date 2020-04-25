@@ -9,30 +9,40 @@ namespace Yandex.Alice.Sdk.Helpers
     {
         public const string DefaultReducedStringEnding = "...";
 
-        public static string PrepareGalleryCardItemTitle(string title, string ending = DefaultReducedStringEnding)
+        public static string PrepareGalleryCardItemTitle(string title, string reducedEnding = DefaultReducedStringEnding)
         {
-            return ReduceString(title, AliceGalleryCardItem.MaxTitleLength, ending);
+            return PrepareGalleryCardItemTitle(title, string.Empty, reducedEnding);
         }
 
-        public static string ReduceString(string value, int maxLenght, string ending)
+        public static string PrepareGalleryCardItemTitle(string title, string mandatoryEnding, string reducedEnding = DefaultReducedStringEnding)
+        {
+            return ReduceString(title, AliceGalleryCardItem.MaxTitleLength, mandatoryEnding, reducedEnding);
+        }
+
+        public static string ReduceString(string value, int maxLenght, string mandatoryEnding, string reducedEnding)
         {
             if (value == null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
-            if (value.Length <= maxLenght)
+            if(mandatoryEnding == null)
             {
-                return value;
+                throw new ArgumentNullException(nameof(mandatoryEnding));
             }
-            if (ending == null)
+            if (reducedEnding == null)
             {
-                throw new ArgumentNullException(nameof(ending));
+                throw new ArgumentNullException(nameof(reducedEnding));
             }
-            int maxReducedStringLength = maxLenght - ending.Length;
+
+            if (value.Length + mandatoryEnding.Length <= maxLenght)
+            {
+                return value + mandatoryEnding;
+            }
+            int maxReducedStringLength = maxLenght - mandatoryEnding.Length - reducedEnding.Length;
             string reducedString = value.Substring(0, maxReducedStringLength);
             int lastWhitespaceIndex = reducedString.LastIndexOf(" ", StringComparison.OrdinalIgnoreCase);
             reducedString = reducedString.Substring(0, lastWhitespaceIndex);
-            return reducedString.TrimEnd('.', ',', '-', ':') + ending;
+            return reducedString.TrimEnd('.', ',', '-', ':') + reducedEnding + mandatoryEnding;
         }
     }
 }

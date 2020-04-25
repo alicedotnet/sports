@@ -8,5 +8,7 @@ namespace Sports.Models
     {
         public string Title { get; set; }
         public Uri Url { get; set; }
+        public int CommentsCount { get; set; }
+        public bool IsHotContent { get; set; }
     }
 }

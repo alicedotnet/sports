@@ -26,7 +26,9 @@ namespace Sports.Services
                 .Select(x => new NewsArticleModel() 
                 { 
                     Title = x.Title,
-                    Url = x.Url
+                    Url = x.Url,
+                    CommentsCount = x.CommentsCount,
+                    IsHotContent = x.IsHotContent
                 })
                 .ToArray();
         }

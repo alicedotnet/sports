@@ -25,7 +25,13 @@ namespace Sports.Services
 
         public async Task SyncAllAsync()
         {
-            var newsResponse = await _sportsRuApiService.GetNewsAsync(NewsType.HomePage, NewsPriority.Main, NewsContentOrigin.Mixed, 10).ConfigureAwait(false);
+            var newsResponse = await _sportsRuApiService.GetNewsAsync(NewsType.HomePage, NewsPriority.Main, NewsContentOrigin.Mixed, 100).ConfigureAwait(false);
+            var hotContent = await _sportsRuApiService.GetHotContent().ConfigureAwait(false);
+            var hotNews = Array.Empty<int>();
+            if(hotContent.IsSuccess)
+            {
+                hotNews = hotContent.Content.News;
+            }
             if(newsResponse.IsSuccess)
             {
                 foreach (var newsArticle in newsResponse.Content)
@@ -36,21 +42,36 @@ namespace Sports.Services
                         continue;
                     }
                     string idString = newsArticle.Id.ToString(CultureInfo.InvariantCulture);
-                    if (!_sportsContext.NewsArticles.Any(x => x.ExternalId == idString))
+                    var existingArticle = _sportsContext.NewsArticles.FirstOrDefault(x => x.ExternalId == idString);
+                    if (existingArticle == null)
                     {
                         _sportsContext.NewsArticles.Add(new NewsArticle()
                         {
                             ExternalId = idString,
                             Title = newsArticle.Title,
                             Url = newsArticle.DesktopUrl,
+                            IsHotContent = IsHotContent(newsArticle.Id, hotNews),
+                            CommentsCount = newsArticle.CommentsCount,
                             PublishedDate = DateTimeOffset
                                 .FromUnixTimeSeconds(newsArticle.Published.Timestamp)
                                 .UtcDateTime
                         });
                     }
+                    else
+                    {
+                        existingArticle.IsHotContent = IsHotContent(newsArticle.Id, hotNews);
+                        existingArticle.CommentsCount = newsArticle.CommentsCount;
+
+                        _sportsContext.NewsArticles.Update(existingArticle);
+                    }
                 }
                 _sportsContext.SaveChanges();
             }
+        }
+
+        private bool IsHotContent(int newsArticleId, int[] hotNews)
+        {
+            return hotNews.Contains(newsArticleId);
         }
 
         public void DeleteOldData(DateTimeOffset oldestDateToKeep)

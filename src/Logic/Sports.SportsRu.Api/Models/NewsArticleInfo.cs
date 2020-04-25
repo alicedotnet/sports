@@ -19,6 +19,8 @@ namespace Sports.SportsRu.Api.Models
         public ContentOption ContentOption { get; set; }
         [JsonPropertyName("published")]
         public NewsArticlePublished Published { get; set; }
+        [JsonPropertyName("comments_count")]
+        public int CommentsCount { get; set; }
     }
 
     public class NewsArticlePublished

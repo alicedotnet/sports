@@ -32,5 +32,22 @@ namespace Sports.Services
                 })
                 .ToArray();
         }
+
+        public IEnumerable<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, int newsCount)
+        {
+            var date = fromDate.UtcDateTime;
+            return _sportsContext.NewsArticles
+                .Where(x => x.PublishedDate >= date)
+                .OrderByDescending(x => x.CommentsCount)
+                .Take(newsCount)
+                .Select(x => new NewsArticleModel()
+                {
+                    Title = x.Title,
+                    Url = x.Url,
+                    CommentsCount = x.CommentsCount,
+                    IsHotContent = x.IsHotContent
+                })
+                .ToArray();
+        }
     }
 }

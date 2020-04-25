@@ -8,5 +8,6 @@ namespace Sports.Services.Interfaces
     public interface INewsService
     {
         IEnumerable<NewsArticleModel> GetLatestNews(int newsCount);
+        IEnumerable<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, int newsCount);
     }
 }

@@ -7,6 +7,7 @@ using Sports.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Yandex.Alice.Sdk.Helpers;
 using Yandex.Alice.Sdk.Models;
 
@@ -19,7 +20,7 @@ namespace Sports.Alice.Services
 
         public AliceService(INewsService newsService, IOptions<SportsSettings> sportsSettings)
         {
-            if(sportsSettings == null)
+            if (sportsSettings == null)
             {
                 throw new ArgumentNullException(nameof(sportsSettings));
             }
@@ -29,54 +30,144 @@ namespace Sports.Alice.Services
 
         public AliceResponseBase ProcessRequest(AliceRequest aliceRequest)
         {
-            if(aliceRequest == null)
+            if (aliceRequest == null)
             {
                 throw new ArgumentNullException(nameof(aliceRequest));
             }
 
-            var buttons = new List<AliceButtonModel>()
+            AliceCommand aliceCommand = AliceCommand.Undefined;
+            if (aliceRequest.Session.New)
             {
-                new AliceButtonModel()
+                aliceCommand = AliceCommand.LatestNews;
+            }
+            else if (aliceRequest.Request.Type == AliceRequestType.ButtonPressed)
+            {
+                if (aliceRequest.Request.Payload is JsonElement element && element.ValueKind == JsonValueKind.Number)
                 {
-                    Title = "последние новости"
+                    aliceCommand = (AliceCommand)element.GetInt32();
                 }
-            };
-            if (aliceRequest.Session.New || 
-                aliceRequest.Request.Nlu.Tokens.Contains("новости") ||
-                aliceRequest.Request.Nlu.Tokens.Contains("расскажи"))
+            }
+            else if (aliceRequest.Request.Nlu.Tokens.Contains("новости"))
             {
-                var news = _newsService.GetLatestNews(_sportsSettings.NewsToDisplay);
-                if (news.Any())
+                if (aliceRequest.Request.Nlu.Tokens.Contains("главные") || aliceRequest.Request.Nlu.Tokens.Contains("популярные"))
                 {
-                    var titles = news.Select(x => x.Title);
-                    string text = "Вот последние новости\n\n" + string.Join("\n\n", titles);
-                    string tts = "Вот последние новости. " + string.Join(". ", titles);
-                    var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
-                    response.Response.Card.Items = new List<AliceGalleryCardItem>();
-                    response.Response.Card.Header = new AliceGalleryCardHeaderModel("Последние новости");
-                    foreach (var newsArticle in news)
-                    {
-                        response.Response.Card.Items.Add(new AliceGalleryCardItem()
-                        {
-                            Title = AliceHelper
-                                .PrepareGalleryCardItemTitle(newsArticle.Title, GetTitleEnding(newsArticle), AliceHelper.DefaultReducedStringEnding),
-                            Button = new AliceImageCardButtonModel()
-                            {
-                                Url = newsArticle.Url
-                            }
-                        });
-                    }
-                    return response;
+                    aliceCommand = AliceCommand.MainNews;
                 }
                 else
                 {
-                    return new AliceResponse(aliceRequest, "У меня нет новостей", buttons);
+                    aliceCommand = AliceCommand.LatestNews;
                 }
+            }
+
+            switch (aliceCommand)
+            {
+                case AliceCommand.LatestNews:
+                    return GetLatestNews(aliceRequest);
+                case AliceCommand.MainNews:
+                    return GetMainNews(aliceRequest);
+                default:
+                    return GetHelp(aliceRequest);
+            }
+        }
+
+        private AliceResponseBase GetLatestNews(AliceRequest aliceRequest)
+        {
+            var buttons = new List<AliceButtonModel>()
+                {
+                    new AliceButtonModel()
+                    {
+                        Title = AliceCommands.MainNews,
+                        Payload = AliceCommand.MainNews,
+                        Hide = true
+                    }
+                };
+            var news = _newsService.GetLatestNews(_sportsSettings.NewsToDisplay);
+            if (news.Any())
+            {
+                var titles = news.Select(x => x.Title);
+                string text = "Вот последние новости\n\n" + string.Join("\n\n", titles);
+                string tts = "Вот последние новости. " + string.Join(". ", titles) + " sil <[1000]> Чтобы узнать дополнительные возможности скажите: помощь";
+                var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
+                response.Response.Card.Items = new List<AliceGalleryCardItem>();
+                response.Response.Card.Header = new AliceGalleryCardHeaderModel("Последние новости");
+                foreach (var newsArticle in news)
+                {
+                    response.Response.Card.Items.Add(new AliceGalleryCardItem()
+                    {
+                        Title = AliceHelper
+                            .PrepareGalleryCardItemTitle(newsArticle.Title, GetTitleEnding(newsArticle), AliceHelper.DefaultReducedStringEnding),
+                        Button = new AliceImageCardButtonModel()
+                        {
+                            Url = newsArticle.Url
+                        }
+                    });
+                }
+                return response;
             }
             else
             {
-                return new AliceResponse(aliceRequest, "Вы можете попросить меня прочитать последние новости спорта сказав фразу: расскажи новости", buttons);
+                return new AliceResponse(aliceRequest, "У меня нет последний новостей", buttons);
             }
+        }
+
+        private AliceResponseBase GetMainNews(AliceRequest aliceRequest)
+        {
+            var buttons = new List<AliceButtonModel>()
+                {
+                    new AliceButtonModel()
+                    {
+                        Title = AliceCommands.LatestNews,
+                        Payload = AliceCommand.LatestNews,
+                        Hide = true
+                    }
+                };
+            var news = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), _sportsSettings.NewsToDisplay);
+            if (news.Any())
+            {
+                var titles = news.Select(x => x.Title);
+                string text = "Вот главные новости\n\n" + string.Join("\n\n", titles);
+                string tts = "Вот главные новости. " + string.Join(". ", titles) + " sil <[1000]> Чтобы узнать дополнительные возможности скажите: помощь";
+                var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
+                response.Response.Card.Items = new List<AliceGalleryCardItem>();
+                response.Response.Card.Header = new AliceGalleryCardHeaderModel("Главные новости");
+                foreach (var newsArticle in news)
+                {
+                    response.Response.Card.Items.Add(new AliceGalleryCardItem()
+                    {
+                        Title = AliceHelper
+                            .PrepareGalleryCardItemTitle(newsArticle.Title, GetTitleEnding(newsArticle), AliceHelper.DefaultReducedStringEnding),
+                        Button = new AliceImageCardButtonModel()
+                        {
+                            Url = newsArticle.Url
+                        }
+                    });
+                }
+                return response;
+            }
+            else
+            {
+                return new AliceResponse(aliceRequest, "У меня нет главных новостей", buttons);
+            }
+        }
+
+        private AliceResponseBase GetHelp(AliceRequest aliceRequest)
+        {
+            var buttons = new List<AliceButtonModel>()
+                {
+                    new AliceButtonModel()
+                    {
+                        Title = AliceCommands.LatestNews,
+                        Payload = AliceCommand.LatestNews
+                    },
+                    new AliceButtonModel()
+                    {
+                        Title = AliceCommands.MainNews,
+                        Payload = AliceCommand.MainNews
+                    }
+                };
+            string text = "Вы можете попросить меня прочитать последние новости спорта сказав фразу: последние новости или главные новости с помощью фразы: главные новости";
+            string tts = "Вы можете попросить меня прочитать последние новости спорта сказав фразу: последние новости. или главные новости с помощью фразы: главные новости";
+            return new AliceResponse(aliceRequest,text, tts, buttons);
         }
 
         private string GetTitleEnding(NewsArticleModel newsArticle)

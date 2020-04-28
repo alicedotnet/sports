@@ -12,6 +12,7 @@ namespace Yandex.Alice.Sdk.Models
         }
 
         public AliceGalleryResponse(AliceRequest request, string text, string tts, List<AliceButtonModel> buttons)
+            : base(request)
         {
             if (request == null)
             {

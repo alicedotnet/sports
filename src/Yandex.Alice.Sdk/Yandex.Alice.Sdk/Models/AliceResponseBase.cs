@@ -9,6 +9,17 @@ namespace Yandex.Alice.Sdk.Models
     {
         [JsonPropertyName("response")]
         public T Response { get; set; }
+
+        protected AliceResponseBase()
+        {
+
+        }
+
+        protected AliceResponseBase(AliceRequest request)
+            :base(request)
+        {
+
+        }
     }
 
     public abstract class AliceResponseBase
@@ -20,5 +31,19 @@ namespace Yandex.Alice.Sdk.Models
         public object SessionState { get; set; }
         [JsonPropertyName("user_state_update")]
         public object UserStateUpdate { get; set; }
+
+        protected AliceResponseBase()
+        {
+
+        }
+
+        protected AliceResponseBase(AliceRequest request)
+        {
+            if(request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            Version = request.Version;
+        }
     }
 }

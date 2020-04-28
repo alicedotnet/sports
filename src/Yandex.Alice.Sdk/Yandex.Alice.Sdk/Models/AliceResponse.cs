@@ -18,13 +18,8 @@ namespace Yandex.Alice.Sdk.Models
         }
 
         public AliceResponse(AliceRequest request, string text, string tts, List<AliceButtonModel> buttons)
+            : base(request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            Version = request.Version;
             Response = new AliceResponseModel()
             {
                 Text = text,
@@ -32,6 +27,5 @@ namespace Yandex.Alice.Sdk.Models
                 Buttons = buttons
             };
         }
-
     }
 }

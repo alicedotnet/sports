@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Sports.Alice.Workers;
+using Sports.Common.Tests.Extensions;
 using Sports.Data.Context;
 using System;
 using System.Collections.Generic;
@@ -33,8 +35,10 @@ namespace Sports.Alice.Tests.TestsInfrastructure.Fixtures
 
         private void SetupMockContext(HostBuilderContext hostBuilderContext, IServiceCollection services)
         {
-            var descriptor = services.FirstOrDefault(x => x.ServiceType == typeof(SportsContext));
-            services.Remove(descriptor);
+            services.Remove<SportsContext>();
+            services.RemoveWorker<SyncNewsWorker>();
+            services.RemoveWorker<SyncNewsCommentsWorker>();
+            services.RemoveWorker<CleanWorker>();
 
             services
                 .AddDbContext<SportsContext>(builder => builder

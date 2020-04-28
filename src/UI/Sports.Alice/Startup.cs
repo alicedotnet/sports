@@ -76,16 +76,6 @@ namespace Sports.Alice
             {
                 endpoints.MapControllers();
             });
-
-            app.Use(async (context, next) =>
-            {
-                int i = 1;
-
-                // Call the next delegate/middleware in the pipeline
-                await next();
-            });
-
-            app.Run(async (context) => { });
         }
     }
 }

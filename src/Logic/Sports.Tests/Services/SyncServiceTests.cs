@@ -66,7 +66,6 @@ namespace Sports.Tests.Services
         [Fact]
         public void DeleteAfterDate()
         {
-            Assert.False(_sportsContext.NewsArticles.Any());
             _sportsContext.NewsArticles.Add(new NewsArticle() 
                 { Title = "test", PublishedDate = DateTime.Now.AddDays(-1) });
             _sportsContext.SaveChanges();

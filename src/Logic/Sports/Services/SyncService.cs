@@ -16,14 +16,16 @@ namespace Sports.Services
     {
         private readonly SportsContext _sportsContext;
         private readonly ISportsRuApiService _sportsRuApiService;
+        private readonly INewsService _newsService;
 
-        public SyncService(SportsContext sportsContext, ISportsRuApiService sportsRuApiService)
+        public SyncService(SportsContext sportsContext, ISportsRuApiService sportsRuApiService, INewsService newsService)
         {
             _sportsContext = sportsContext;
             _sportsRuApiService = sportsRuApiService;
+            _newsService = newsService;
         }
 
-        public async Task SyncAllAsync()
+        public async Task SyncNewsAsync()
         {
             var newsResponse = await _sportsRuApiService.GetNewsAsync(NewsType.HomePage, NewsPriority.Main, NewsContentOrigin.Mixed, 100).ConfigureAwait(false);
             var hotContent = await _sportsRuApiService.GetHotContent().ConfigureAwait(false);
@@ -67,6 +69,52 @@ namespace Sports.Services
                 }
                 _sportsContext.SaveChanges();
             }
+        }
+
+        public async Task SyncPopularNewsCommentsAsync(DateTimeOffset fromDate, int newsCount)
+        {
+            var popularNews = _newsService.GetPopularNews(fromDate, newsCount);
+            foreach (var newsArticle in popularNews)
+            {
+                if(int.TryParse(newsArticle.ExternalId, out int id))
+                {
+                    var commentsIdsResponse = await _sportsRuApiService.GetCommentsIdsAsync(id, MessageClass.News, Sort.Top10).ConfigureAwait(false);
+                    if (commentsIdsResponse.IsSuccess)
+                    {
+                        var commentsByIdsResponse = await _sportsRuApiService.GetCommentsByIds(commentsIdsResponse.Content).ConfigureAwait(false);
+                        if(commentsByIdsResponse.IsSuccess)
+                        {
+                            foreach (var comment in commentsByIdsResponse.Content.Data.Comments)
+                            {
+                                var existingComment = _sportsContext.NewsArticlesComments.FirstOrDefault(x => x.ExternalId == comment.Id.ToString(CultureInfo.InvariantCulture));
+                                if(existingComment == null)
+                                {
+                                    _sportsContext.NewsArticlesComments.Add(new NewsArticleComment()
+                                    {
+                                        NewsArticleId = newsArticle.Id,
+                                        ExternalId = comment.Id.ToString(CultureInfo.InvariantCulture),
+                                        Text = NormalizeText(comment.Text),
+                                        Rating = comment.Rating.Plus + comment.Rating.Minus
+                                    });
+                                }
+                                else
+                                {
+                                    existingComment.Rating = comment.Rating.Plus + comment.Rating.Minus;
+                                    existingComment.Text = NormalizeText(comment.Text);
+
+                                    _sportsContext.NewsArticlesComments.Update(existingComment);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            _sportsContext.SaveChanges();
+        }
+
+        private string NormalizeText(string value)
+        {
+            return value.Replace("<br />", "\n");
         }
 
         private bool IsHotContent(int newsArticleId, int[] hotNews)

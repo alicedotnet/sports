@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sports.Data.Context;
 
 namespace Sports.Alice.Migrations
 {
     [DbContext(typeof(SportsContext))]
-    partial class SportsContextModelSnapshot : ModelSnapshot
+    [Migration("20200427051720_CommentsTable")]
+    partial class CommentsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

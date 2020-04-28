@@ -13,5 +13,6 @@ namespace Sports.Data.Entities
         public string ExternalId { get; set; }
         public bool IsHotContent { get; set; }
         public int CommentsCount { get; set; }
+        public virtual ICollection<NewsArticleComment> Comments { get; set; }
     }
 }

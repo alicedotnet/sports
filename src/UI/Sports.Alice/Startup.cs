@@ -41,15 +41,18 @@ namespace Sports.Alice
             services.AddScoped<ISyncService, SyncService>();
             services.AddScoped<ISportsRuApiService, SportsRuApiService>();
             services.AddScoped<INewsService, NewsService>();
+            services.AddScoped<INewsArticleCommentService, NewsArticleCommentService>();
 
             services.Configure<SportsSettings>(Configuration.GetSection("SportsSettings"));
 
             string connectionString = Configuration.GetConnectionString("database");
             string assemblyName = this.GetType().Assembly.GetName().Name;
             services.AddDbContext<SportsContext>(builder => builder
+                .UseLazyLoadingProxies()
                 .UseSqlite(connectionString, b => b.MigrationsAssembly(assemblyName)));
 
-            services.AddHostedService<SyncWorker>();
+            services.AddHostedService<SyncNewsWorker>();
+            services.AddHostedService<SyncNewsCommentsWorker>();
             services.AddHostedService<CleanWorker>();
         }
 

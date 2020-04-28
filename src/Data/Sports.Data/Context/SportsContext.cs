@@ -13,5 +13,6 @@ namespace Sports.Data.Context
         }
 
         public DbSet<NewsArticle> NewsArticles { get; set; }
+        public DbSet<NewsArticleComment> NewsArticlesComments { get; set; }
     }
 }

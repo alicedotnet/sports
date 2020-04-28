@@ -50,8 +50,7 @@ namespace Sports.Alice.Tests.Services
             var aliceResponse = _aliceService.ProcessRequest(aliceRequest);
             var aliceGalleryResponse = aliceResponse as AliceGalleryResponse;
             TestOutputHelper.WriteLine($"Response text: {aliceGalleryResponse.Response.Text}");
-            var news = aliceGalleryResponse.Response.Text.Split("\n\n");
-            Assert.Equal(_sportsSettings.NewsToDisplay, news.Length);
+            Assert.Equal(_sportsSettings.NewsToDisplay, aliceGalleryResponse.Response.Card.Items.Count);
         }
 
         [Fact]

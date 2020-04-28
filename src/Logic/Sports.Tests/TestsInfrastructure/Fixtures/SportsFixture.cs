@@ -13,6 +13,8 @@ namespace Sports.Tests.TestsInfrastructure.Fixtures
     public class SportsFixture
     {
         public ISyncService SyncService { get; }
+        public INewsService NewsService { get; }
+        public INewsArticleCommentService NewsArticleCommentService { get; }
         public SportsContext SportsContext { get; }
 
         public SportsFixture()
@@ -22,8 +24,9 @@ namespace Sports.Tests.TestsInfrastructure.Fixtures
             SportsContext = new SportsContext(builder.Options);
 
             ISportsRuApiService sportsRuApiService = new SportsRuApiService();
-
-            SyncService = new SyncService(SportsContext, sportsRuApiService);
+            NewsService = new NewsService(SportsContext);
+            SyncService = new SyncService(SportsContext, sportsRuApiService, NewsService);
+            NewsArticleCommentService = new NewsArticleCommentService(SportsContext);
         }
     }
 }

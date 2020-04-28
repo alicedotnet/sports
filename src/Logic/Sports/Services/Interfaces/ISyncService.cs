@@ -7,7 +7,8 @@ namespace Sports.Services.Interfaces
 {
     public interface ISyncService
     {
-        Task SyncAllAsync();
+        Task SyncNewsAsync();
+        Task SyncPopularNewsCommentsAsync(DateTimeOffset fromDate, int newsCount);
         void DeleteOldData(DateTimeOffset oldestDateToKeep);
     }
 }

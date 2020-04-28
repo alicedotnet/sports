@@ -5,8 +5,10 @@ using Sports.Alice.Services.Interfaces;
 using Sports.Models;
 using Sports.Services.Interfaces;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using Yandex.Alice.Sdk.Helpers;
 using Yandex.Alice.Sdk.Models;
@@ -16,15 +18,17 @@ namespace Sports.Alice.Services
     public class AliceService : IAliceService
     {
         private readonly INewsService _newsService;
+        private readonly INewsArticleCommentService _newsArticleCommentService;
         private readonly SportsSettings _sportsSettings;
 
-        public AliceService(INewsService newsService, IOptions<SportsSettings> sportsSettings)
+        public AliceService(INewsService newsService, INewsArticleCommentService newsArticleCommentService, IOptions<SportsSettings> sportsSettings)
         {
             if (sportsSettings == null)
             {
                 throw new ArgumentNullException(nameof(sportsSettings));
             }
             _newsService = newsService;
+            _newsArticleCommentService = newsArticleCommentService;
             _sportsSettings = sportsSettings.Value;
         }
 
@@ -35,36 +39,45 @@ namespace Sports.Alice.Services
                 throw new ArgumentNullException(nameof(aliceRequest));
             }
 
-            AliceCommand aliceCommand = AliceCommand.Undefined;
+            AliceCommand aliceCommand = new AliceCommand();
             if (aliceRequest.Session.New)
             {
-                aliceCommand = AliceCommand.LatestNews;
+                aliceCommand.Type = AliceCommandType.LatestNews;
             }
-            else if (aliceRequest.Request.Type == AliceRequestType.ButtonPressed)
+            else if (aliceRequest.Request.Type == AliceRequestType.ButtonPressed &&
+                aliceRequest.Request.Payload is JsonElement element &&
+                element.ValueKind == JsonValueKind.Object)
             {
-                if (aliceRequest.Request.Payload is JsonElement element && element.ValueKind == JsonValueKind.Number)
-                {
-                    aliceCommand = (AliceCommand)element.GetInt32();
-                }
+                var bufferWriter = new ArrayBufferWriter<byte>();
+                using (var writer = new Utf8JsonWriter(bufferWriter))
+                    element.WriteTo(writer);
+                aliceCommand = JsonSerializer.Deserialize<AliceCommand>(bufferWriter.WrittenSpan);
             }
             else if (aliceRequest.Request.Nlu.Tokens.Contains("новости"))
             {
                 if (aliceRequest.Request.Nlu.Tokens.Contains("главные") || aliceRequest.Request.Nlu.Tokens.Contains("популярные"))
                 {
-                    aliceCommand = AliceCommand.MainNews;
+                    aliceCommand.Type = AliceCommandType.MainNews;
                 }
                 else
                 {
-                    aliceCommand = AliceCommand.LatestNews;
+                    aliceCommand.Type = AliceCommandType.LatestNews;
                 }
             }
-
-            switch (aliceCommand)
+            else if (aliceRequest.Request.Nlu.Tokens.Contains("комментарии")
+                || aliceRequest.Request.Nlu.Tokens.Contains("комментарий"))
             {
-                case AliceCommand.LatestNews:
+                aliceCommand.Type = AliceCommandType.BestComments;
+            }
+
+            switch (aliceCommand.Type)
+            {
+                case AliceCommandType.LatestNews:
                     return GetLatestNews(aliceRequest);
-                case AliceCommand.MainNews:
+                case AliceCommandType.MainNews:
                     return GetMainNews(aliceRequest);
+                case AliceCommandType.BestComments:
+                    return GetBestComments(aliceRequest, aliceCommand.Payload);
                 default:
                     return GetHelp(aliceRequest);
             }
@@ -76,8 +89,8 @@ namespace Sports.Alice.Services
                 {
                     new AliceButtonModel()
                     {
-                        Title = AliceCommands.MainNews,
-                        Payload = AliceCommand.MainNews,
+                        Title = AliceCommandsTitle.MainNews,
+                        Payload = new AliceCommand(AliceCommandType.MainNews),
                         Hide = true
                     }
                 };
@@ -116,8 +129,8 @@ namespace Sports.Alice.Services
                 {
                     new AliceButtonModel()
                     {
-                        Title = AliceCommands.LatestNews,
-                        Payload = AliceCommand.LatestNews,
+                        Title = AliceCommandsTitle.LatestNews,
+                        Payload = new AliceCommand(AliceCommandType.LatestNews),
                         Hide = true
                     }
                 };
@@ -150,19 +163,109 @@ namespace Sports.Alice.Services
             }
         }
 
+        private AliceResponseBase GetBestComments(AliceRequest aliceRequest, object payload)
+        {
+            var fromDate = DateTimeOffset.Now.AddDays(-1);
+            NewsArticleModel newsArticle;
+            if (payload is JsonElement element && 
+                element.ValueKind == JsonValueKind.String &&
+                Guid.TryParse(element.GetString(), out Guid id))
+            {
+                newsArticle = _newsService.GetById(id);
+            }
+            else
+            {
+                newsArticle = _newsService.GetPopularNews(fromDate, 1).FirstOrDefault();
+            }
+            var comments = _newsArticleCommentService.GetBestComments(newsArticle.Id, _sportsSettings.CommentsToDisplay);
+            if (comments != null && comments.Any())
+            {
+                var buttons = new List<AliceButtonModel>()
+                {
+                    new AliceButtonModel()
+                    {
+                        Title = "к новости",
+                        Url = newsArticle.Url,
+                        Hide = true
+                    }
+                };
+                string ttsEnding = string.Empty;
+                var nextNewsArticle = _newsService.GetNextPopularNewsArticle(fromDate, newsArticle.Id);
+                if (nextNewsArticle != null)
+                {
+                    ttsEnding = $" {TtsHelper.GetSilenceString(500)} для перехода к следующий новости скажите: дальше";
+                    buttons.Add(new AliceButtonModel()
+                    {
+                        Title = "дальше",
+                        Payload = new AliceCommand(AliceCommandType.BestComments, nextNewsArticle.Id),
+                        Hide = true
+                    });
+                }
+                buttons.Add(new AliceButtonModel()
+                {
+                    Title = AliceCommandsTitle.LatestNews,
+                    Payload = new AliceCommand(AliceCommandType.LatestNews),
+                    Hide = true
+                });
+                buttons.Add(new AliceButtonModel()
+                {
+                    Title = AliceCommandsTitle.MainNews,
+                    Payload = new AliceCommand(AliceCommandType.MainNews),
+                    Hide = true
+                });
+
+                var text = new StringBuilder($"Лучшие комментарии под новостью \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
+                var tts = new StringBuilder($"Лучшие комментарии под новостью \"{newsArticle.Title}\": sil <[500]> ");
+                foreach (var comment in comments)
+                {
+                    string textComment = $"\n\n{EmojiLibrary.SpeechBalloon} {comment.CommentText} {EmojiLibrary.ThumbsUp}{comment.CommentRating}";
+                    string textTts = $" sil <[500]>  {comment.CommentText}";
+                    if (text.Length + textComment.Length <= AliceResponseModel.TextMaxLenght
+                        && tts.Length + textTts.Length + ttsEnding.Length <= AliceResponseModel.TtsMaxLenght)
+                    {
+                        text.Append(textComment);
+                        tts.Append(textTts);
+                    }
+                }
+                tts.Append(ttsEnding);
+
+                var response = new AliceResponse(aliceRequest, text.ToString(), tts.ToString(), buttons);
+                return response;
+            }
+            else
+            {
+                var buttons = new List<AliceButtonModel>()
+                {
+                    new AliceButtonModel()
+                    {
+                        Title = AliceCommandsTitle.LatestNews,
+                        Payload = new AliceCommand(AliceCommandType.LatestNews),
+                        Hide = true
+                    },
+                    new AliceButtonModel()
+                    {
+                        Title = AliceCommandsTitle.MainNews,
+                        Payload = new AliceCommand(AliceCommandType.MainNews),
+                        Hide = true
+                    }
+                };
+                return new AliceResponse(aliceRequest, "У меня нет лучших комментариев", buttons);
+            }
+        }
+
         private AliceResponseBase GetHelp(AliceRequest aliceRequest)
         {
             var buttons = new List<AliceButtonModel>()
                 {
                     new AliceButtonModel()
                     {
-                        Title = AliceCommands.LatestNews,
-                        Payload = AliceCommand.LatestNews
+                        Title = AliceCommandsTitle.LatestNews,
+                        Payload = new AliceCommand(AliceCommandType.LatestNews)
                     },
                     new AliceButtonModel()
                     {
-                        Title = AliceCommands.MainNews,
-                        Payload = AliceCommand.MainNews
+                        Title = AliceCommandsTitle.MainNews,
+                        Payload = new AliceCommand(AliceCommandType.MainNews)
                     }
                 };
             string text = "Вы можете попросить меня прочитать последние новости спорта сказав фразу: последние новости или главные новости с помощью фразы: главные новости";

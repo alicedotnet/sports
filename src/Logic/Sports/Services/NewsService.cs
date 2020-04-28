@@ -18,6 +18,24 @@ namespace Sports.Services
             _sportsContext = sportsContext;
         }
 
+        public NewsArticleModel GetById(Guid id)
+        {
+            var entity = _sportsContext.NewsArticles.FirstOrDefault(x => x.NewsArticleId == id);
+            if(entity != null)
+            {
+                return new NewsArticleModel()
+                {
+                    Id = entity.NewsArticleId,
+                    Title = entity.Title,
+                    Url = entity.Url,
+                    CommentsCount = entity.CommentsCount,
+                    IsHotContent = entity.IsHotContent,
+                    ExternalId = entity.ExternalId
+                };
+            }
+            return null;
+        }
+
         public IEnumerable<NewsArticleModel> GetLatestNews(int newsCount)
         {
             return _sportsContext.NewsArticles
@@ -42,12 +60,34 @@ namespace Sports.Services
                 .Take(newsCount)
                 .Select(x => new NewsArticleModel()
                 {
+                    Id = x.NewsArticleId,
                     Title = x.Title,
                     Url = x.Url,
                     CommentsCount = x.CommentsCount,
-                    IsHotContent = x.IsHotContent
+                    IsHotContent = x.IsHotContent,
+                    ExternalId = x.ExternalId
                 })
                 .ToArray();
+        }
+
+        public NewsArticleModel GetNextPopularNewsArticle(DateTimeOffset fromDate, Guid newsArticleId)
+        {
+            var date = fromDate.UtcDateTime;
+            var newsArticle = _sportsContext.NewsArticles
+                .Where(x => x.PublishedDate >= date)
+                .OrderByDescending(x => x.CommentsCount)
+                .AsEnumerable()
+                .SkipWhile(x => x.NewsArticleId != newsArticleId)
+                .Skip(1)
+                .FirstOrDefault();
+            if(newsArticle != null)
+            {
+                return new NewsArticleModel()
+                {
+                    Id = newsArticle.NewsArticleId
+                };
+            }
+            return null;
         }
     }
 }

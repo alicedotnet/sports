@@ -22,15 +22,14 @@ namespace Sports.Alice.Tests.Services
     [Collection(TestsConstants.ServerCollectionName)]
     public class AliceServiceTests : BaseTests
     {
-        private readonly IAliceService _aliceService;
         private readonly SportsSettings _sportsSettings;
+        private readonly IServiceProvider _services;
 
         public AliceServiceTests(MockContextFixture mockContextFixture, ITestOutputHelper testOutputHelper)
             : base(testOutputHelper)
         {
-            var scope = mockContextFixture.Services.CreateScope();
-            _sportsSettings = scope.ServiceProvider.GetService<IOptions<SportsSettings>>().Value;
-            _aliceService = scope.ServiceProvider.GetService<IAliceService>();
+            _services = mockContextFixture.Services;
+            _sportsSettings = _services.GetService<IOptions<SportsSettings>>().Value;
         }
 
         [Fact]
@@ -47,7 +46,9 @@ namespace Sports.Alice.Tests.Services
                     }
                 }
             };
-            var aliceResponse = _aliceService.ProcessRequest(aliceRequest);
+            using var scope = _services.CreateScope();
+            var aliceService = scope.ServiceProvider.GetService<IAliceService>();
+            var aliceResponse = aliceService.ProcessRequest(aliceRequest);
             var aliceGalleryResponse = aliceResponse as AliceGalleryResponse;
             TestOutputHelper.WriteLine($"Response text: {aliceGalleryResponse.Response.Text}");
             Assert.Equal(_sportsSettings.NewsToDisplay, aliceGalleryResponse.Response.Card.Items.Count);
@@ -57,7 +58,9 @@ namespace Sports.Alice.Tests.Services
         public void InvalidObject()
         {
             AliceRequest aliceRequest = null;
-            var exception = Assert.Throws<ArgumentNullException>(() => _aliceService.ProcessRequest(aliceRequest));
+            using var scope = _services.CreateScope();
+            var aliceService = scope.ServiceProvider.GetService<IAliceService>();
+            var exception = Assert.Throws<ArgumentNullException>(() => aliceService.ProcessRequest(aliceRequest));
             Assert.Equal(nameof(aliceRequest), exception.ParamName);
         }
     }

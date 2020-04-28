@@ -50,6 +50,7 @@ namespace Sports.Alice.Tests.Services
             var aliceService = scope.ServiceProvider.GetService<IAliceService>();
             var aliceResponse = aliceService.ProcessRequest(aliceRequest);
             var aliceGalleryResponse = aliceResponse as AliceGalleryResponse;
+            Assert.NotNull(aliceGalleryResponse);
             TestOutputHelper.WriteLine($"Response text: {aliceGalleryResponse.Response.Text}");
             Assert.Equal(_sportsSettings.NewsToDisplay, aliceGalleryResponse.Response.Card.Items.Count);
         }

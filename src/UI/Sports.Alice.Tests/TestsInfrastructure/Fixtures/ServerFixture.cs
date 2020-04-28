@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Sports.Alice.Workers;
 using Sports.Common.Tests.Extensions;
 using Sports.Data.Context;
+using Sports.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,20 +30,34 @@ namespace Sports.Alice.Tests.TestsInfrastructure.Fixtures
                 })
                 .Start();
             Services = host.Services;
+            InitializeDatabase(Services);
             TestServer testServer = host.GetTestServer();
             HttpClient = testServer.CreateClient();
         }
 
         private void SetupMockContext(HostBuilderContext hostBuilderContext, IServiceCollection services)
         {
-            services.Remove<SportsContext>();
             services.RemoveWorker<SyncNewsWorker>();
             services.RemoveWorker<SyncNewsCommentsWorker>();
             services.RemoveWorker<CleanWorker>();
 
-            services
-                .AddDbContext<SportsContext>(builder => builder
-                    .UseInMemoryDatabase("sports"));
+            services.AddDbContext<SportsContext>(builder => builder.UseInMemoryDatabase("sports"));
+        }
+
+        private void InitializeDatabase(IServiceProvider services)
+        {
+            using var scope = services.CreateScope();
+            var context = scope.ServiceProvider.GetService<SportsContext>();
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+            if(!context.NewsArticles.Any())
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    context.NewsArticles.Add(new NewsArticle() { Title = "test", PublishedDate = DateTime.Now });
+                }
+                context.SaveChanges();
+            }
         }
     }
 }

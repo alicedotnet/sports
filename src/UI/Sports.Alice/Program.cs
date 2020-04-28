@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Sports.Data.Context;
 
 namespace Sports.Alice
 {
@@ -13,7 +16,11 @@ namespace Sports.Alice
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args)
+                .ConfigureServices(ConfigureContext)
+                .Build();
+            InitializeContext(host.Services);
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -30,5 +37,20 @@ namespace Sports.Alice
                     logging.AddFile(configuration);
                     logging.AddConsole();
                 });
+        private static void ConfigureContext(HostBuilderContext ctx, IServiceCollection services)
+        {
+            string connectionString = ctx.Configuration.GetConnectionString("database");
+            string assemblyName = typeof(Program).Assembly.GetName().Name;
+            services.AddDbContext<SportsContext>(builder => builder
+                .UseLazyLoadingProxies()
+                .UseSqlite(connectionString, b => b.MigrationsAssembly(assemblyName)));
+        }
+
+        private static void InitializeContext(IServiceProvider services)
+        {
+            using var scope = services.CreateScope();
+            var sportsContext = scope.ServiceProvider.GetService<SportsContext>();
+            sportsContext.Database.Migrate();
+        }
     }
 }

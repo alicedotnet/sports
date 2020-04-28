@@ -15,5 +15,10 @@ namespace Yandex.Alice.Sdk.Models
     {
         [JsonPropertyName("version")]
         public string Version { get; set; }
+
+        [JsonPropertyName("session_state")]
+        public object SessionState { get; set; }
+        [JsonPropertyName("user_state_update")]
+        public object UserStateUpdate { get; set; }
     }
 }

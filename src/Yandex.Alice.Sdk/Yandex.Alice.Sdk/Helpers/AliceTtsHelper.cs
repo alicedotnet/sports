@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Yandex.Alice.Sdk.Helpers
 {
-    public static class TtsHelper
+    public static class AliceTtsHelper
     {
         public static string GetSilenceString(long milliseconds)
         {

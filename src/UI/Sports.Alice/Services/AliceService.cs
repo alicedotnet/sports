@@ -2,6 +2,7 @@
 using Sports.Alice.Models;
 using Sports.Alice.Models.Settings;
 using Sports.Alice.Services.Interfaces;
+using Sports.Common.Extensions;
 using Sports.Models;
 using Sports.Services.Interfaces;
 using System;
@@ -48,10 +49,7 @@ namespace Sports.Alice.Services
                 aliceRequest.Request.Payload is JsonElement element &&
                 element.ValueKind == JsonValueKind.Object)
             {
-                var bufferWriter = new ArrayBufferWriter<byte>();
-                using (var writer = new Utf8JsonWriter(bufferWriter))
-                    element.WriteTo(writer);
-                aliceCommand = JsonSerializer.Deserialize<AliceCommand>(bufferWriter.WrittenSpan);
+                aliceCommand = element.ToObject<AliceCommand>();
             }
             else if (aliceRequest.Request.Nlu.Tokens.Contains("новости"))
             {
@@ -68,6 +66,15 @@ namespace Sports.Alice.Services
                 || aliceRequest.Request.Nlu.Tokens.Contains("комментарий"))
             {
                 aliceCommand.Type = AliceCommandType.BestComments;
+            }
+            else if(aliceRequest.Request.Nlu.Tokens.Contains("дальше") &&
+                aliceRequest.State != null && 
+                aliceRequest.State.Session is JsonElement sessionElement &&
+                sessionElement.ValueKind == JsonValueKind.Object)
+            {
+                var state = sessionElement.ToObject<SessionState>();
+                aliceCommand.Type = AliceCommandType.BestComments;
+                aliceCommand.Payload = state.NextNewsArticleId;
             }
 
             switch (aliceCommand.Type)
@@ -92,6 +99,12 @@ namespace Sports.Alice.Services
                         Title = AliceCommandsTitle.MainNews,
                         Payload = new AliceCommand(AliceCommandType.MainNews),
                         Hide = true
+                    },
+                    new AliceButtonModel()
+                    {
+                        Title = AliceCommandsTitle.BestComments,
+                        Payload = new AliceCommand(AliceCommandType.BestComments),
+                        Hide = true
                     }
                 };
             var news = _newsService.GetLatestNews(_sportsSettings.NewsToDisplay);
@@ -99,7 +112,7 @@ namespace Sports.Alice.Services
             {
                 var titles = news.Select(x => x.Title);
                 string text = "Вот последние новости\n\n" + string.Join("\n\n", titles);
-                string tts = "Вот последние новости. " + string.Join(". ", titles) + " sil <[1000]> Чтобы узнать дополнительные возможности скажите: помощь";
+                string tts = "Вот последние новости. " + string.Join(AliceTtsHelper.GetSilenceString(500), titles) + " sil <[1000]> Чтобы узнать дополнительные возможности скажите: помощь";
                 var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
                 response.Response.Card.Items = new List<AliceGalleryCardItem>();
                 response.Response.Card.Header = new AliceGalleryCardHeaderModel("Последние новости");
@@ -132,6 +145,12 @@ namespace Sports.Alice.Services
                         Title = AliceCommandsTitle.LatestNews,
                         Payload = new AliceCommand(AliceCommandType.LatestNews),
                         Hide = true
+                    },
+                    new AliceButtonModel()
+                    {
+                        Title = AliceCommandsTitle.BestComments,
+                        Payload = new AliceCommand(AliceCommandType.BestComments),
+                        Hide = true
                     }
                 };
             var news = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), _sportsSettings.NewsToDisplay);
@@ -139,7 +158,7 @@ namespace Sports.Alice.Services
             {
                 var titles = news.Select(x => x.Title);
                 string text = "Вот главные новости\n\n" + string.Join("\n\n", titles);
-                string tts = "Вот главные новости. " + string.Join(". ", titles) + " sil <[1000]> Чтобы узнать дополнительные возможности скажите: помощь";
+                string tts = "Вот главные новости. " + string.Join(AliceTtsHelper.GetSilenceString(500), titles) + " sil <[1000]> Чтобы узнать дополнительные возможности скажите: помощь";
                 var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
                 response.Response.Card.Items = new List<AliceGalleryCardItem>();
                 response.Response.Card.Header = new AliceGalleryCardHeaderModel("Главные новости");
@@ -167,9 +186,9 @@ namespace Sports.Alice.Services
         {
             var fromDate = DateTimeOffset.Now.AddDays(-1);
             NewsArticleModel newsArticle;
-            if (payload is JsonElement element && 
+            if ((payload is Guid id) || (payload is JsonElement element && 
                 element.ValueKind == JsonValueKind.String &&
-                Guid.TryParse(element.GetString(), out Guid id))
+                Guid.TryParse(element.GetString(), out id)))
             {
                 newsArticle = _newsService.GetById(id);
             }
@@ -191,15 +210,21 @@ namespace Sports.Alice.Services
                 };
                 string ttsEnding = string.Empty;
                 var nextNewsArticle = _newsService.GetNextPopularNewsArticle(fromDate, newsArticle.Id);
+                SessionState sessionState = null;
                 if (nextNewsArticle != null)
                 {
-                    ttsEnding = $" {TtsHelper.GetSilenceString(500)} для перехода к следующий новости скажите: дальше";
+                    ttsEnding = $" {AliceTtsHelper.GetSilenceString(500)} для перехода к следующий новости скажите: дальше";
                     buttons.Add(new AliceButtonModel()
                     {
                         Title = "дальше",
                         Payload = new AliceCommand(AliceCommandType.BestComments, nextNewsArticle.Id),
                         Hide = true
                     });
+                    sessionState = new SessionState()
+                    {
+                        NextNewsArticleId = nextNewsArticle.Id
+                    };
+
                 }
                 buttons.Add(new AliceButtonModel()
                 {
@@ -230,6 +255,7 @@ namespace Sports.Alice.Services
                 tts.Append(ttsEnding);
 
                 var response = new AliceResponse(aliceRequest, text.ToString(), tts.ToString(), buttons);
+                response.SessionState = sessionState;
                 return response;
             }
             else
@@ -266,11 +292,16 @@ namespace Sports.Alice.Services
                     {
                         Title = AliceCommandsTitle.MainNews,
                         Payload = new AliceCommand(AliceCommandType.MainNews)
+                    },
+                    new AliceButtonModel()
+                    {
+                        Title = AliceCommandsTitle.BestComments,
+                        Payload = new AliceCommand(AliceCommandType.BestComments),
+                        Hide = true
                     }
                 };
-            string text = "Вы можете попросить меня прочитать последние новости спорта сказав фразу: последние новости или главные новости с помощью фразы: главные новости";
-            string tts = "Вы можете попросить меня прочитать последние новости спорта сказав фразу: последние новости. или главные новости с помощью фразы: главные новости";
-            return new AliceResponse(aliceRequest,text, tts, buttons);
+            string text = "Вы можете попросить меня прочитать последние новости спорта сказав фразу: последние новости, главные новости с помощью фразы: главные новости или лучшие комментарии с помощью фразы: лучшие комментарии";
+            return new AliceResponse(aliceRequest, text, buttons);
         }
 
         private string GetTitleEnding(NewsArticleModel newsArticle)

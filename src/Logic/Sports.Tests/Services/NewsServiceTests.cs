@@ -26,8 +26,9 @@ namespace Sports.Tests.Services
         public async Task NextPopularNewsArticle()
         {
             await _syncService.SyncNewsAsync().ConfigureAwait(false);
-            var article = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), 1).First();
-            var nextArticle = _newsService.GetNextPopularNewsArticle(article.Id);
+            var fromDate = DateTimeOffset.Now.AddDays(-1);
+            var article = _newsService.GetPopularNews(fromDate, 1).First();
+            var nextArticle = _newsService.GetNextPopularNewsArticle(fromDate, article.Id);
             Assert.NotEqual(article.Id, nextArticle.Id);
         }
     }

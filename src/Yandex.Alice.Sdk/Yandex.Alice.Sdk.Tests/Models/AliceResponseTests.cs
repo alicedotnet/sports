@@ -24,6 +24,8 @@ namespace Yandex.Alice.Sdk.Tests.Models
             var aliceResponse = JsonSerializer.Deserialize<AliceResponse>(json);
             Assert.NotNull(aliceResponse);
             Assert.NotEmpty(aliceResponse.Version);
+            Assert.NotNull(aliceResponse.SessionState);
+            Assert.NotNull(aliceResponse.UserStateUpdate);
             Assert.NotNull(aliceResponse.Response);
             Assert.NotEmpty(aliceResponse.Response.Text);
             Assert.NotEmpty(aliceResponse.Response.Tts);
@@ -47,6 +49,8 @@ namespace Yandex.Alice.Sdk.Tests.Models
             var aliceResponse = JsonSerializer.Deserialize<AliceImageResponse>(json);
             Assert.NotNull(aliceResponse);
             Assert.NotEmpty(aliceResponse.Version);
+            Assert.NotNull(aliceResponse.SessionState);
+            Assert.NotNull(aliceResponse.UserStateUpdate);
             Assert.NotNull(aliceResponse.Response);
             Assert.NotEmpty(aliceResponse.Response.Text);
             Assert.NotEmpty(aliceResponse.Response.Tts);
@@ -79,6 +83,8 @@ namespace Yandex.Alice.Sdk.Tests.Models
             var aliceResponse = JsonSerializer.Deserialize<AliceGalleryResponse>(json);
             Assert.NotNull(aliceResponse);
             Assert.NotEmpty(aliceResponse.Version);
+            Assert.NotNull(aliceResponse.SessionState);
+            Assert.NotNull(aliceResponse.UserStateUpdate);
             Assert.NotNull(aliceResponse.Response);
             Assert.NotEmpty(aliceResponse.Response.Text);
             Assert.NotEmpty(aliceResponse.Response.Tts);

@@ -23,5 +23,11 @@
     ],
     "end_session": true
   },
+  "session_state": {
+    "value": 10
+  },
+  "user_state_update": {
+    "value": 42
+  },
   "version": "1.0"
 }

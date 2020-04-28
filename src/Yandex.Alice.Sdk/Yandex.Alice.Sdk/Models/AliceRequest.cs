@@ -16,6 +16,9 @@ namespace Yandex.Alice.Sdk.Models
         [JsonPropertyName("session")]
         public AliceSessionModel Session { get; set; }
 
+        [JsonPropertyName("state")]
+        public AliceStateModel State { get; set; }
+
         [JsonPropertyName("version")]
         public string Version { get; set; }
     }

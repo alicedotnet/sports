@@ -114,7 +114,7 @@ namespace Sports.Services
 
         private string NormalizeText(string value)
         {
-            return value.Replace("<br />", "\n");
+            return value.Replace("<br />", "\n", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool IsHotContent(int newsArticleId, int[] hotNews)

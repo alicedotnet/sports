@@ -25,6 +25,20 @@ namespace Yandex.Alice.Sdk.Tests.Models
             string requestJson = File.ReadAllText(TestsConstants.Assets.AliceRequestFilePath);
             var aliceRequest = JsonSerializer.Deserialize<AliceRequest>(requestJson);
             Assert.NotNull(aliceRequest);
+            Assert.NotNull(aliceRequest.State);
+            Assert.NotNull(aliceRequest.State.Session);
+            Assert.NotNull(aliceRequest.State.User);
+            Assert.NotNull(aliceRequest.Session);
+            Assert.True(aliceRequest.Session.MessageId > 0);
+            Assert.NotEmpty(aliceRequest.Session.SessionId);
+            Assert.NotEmpty(aliceRequest.Session.SkillId);
+            Assert.NotEmpty(aliceRequest.Session.UserId);
+            Assert.NotNull(aliceRequest.Session.User);
+            Assert.NotEmpty(aliceRequest.Session.User.UserId);
+            Assert.NotEmpty(aliceRequest.Session.User.AccessToken);
+            Assert.NotNull(aliceRequest.Session.Application);
+            Assert.NotEmpty(aliceRequest.Session.Application.ApplicationId);
+            Assert.True(aliceRequest.Session.New);
             WritePrettyJson(aliceRequest);
         }
 

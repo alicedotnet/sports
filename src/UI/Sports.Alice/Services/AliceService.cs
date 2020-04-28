@@ -196,87 +196,87 @@ namespace Sports.Alice.Services
             {
                 newsArticle = _newsService.GetPopularNews(fromDate, 1).FirstOrDefault();
             }
-            var comments = _newsArticleCommentService.GetBestComments(newsArticle.Id, _sportsSettings.CommentsToDisplay);
-            if (comments != null && comments.Any())
+            if (newsArticle != null)
             {
-                var buttons = new List<AliceButtonModel>()
+                var comments = _newsArticleCommentService.GetBestComments(newsArticle.Id, _sportsSettings.CommentsToDisplay);
+                if (comments != null && comments.Any())
                 {
-                    new AliceButtonModel()
+                    var buttons = new List<AliceButtonModel>()
                     {
-                        Title = "к новости",
-                        Url = newsArticle.Url,
-                        Hide = true
-                    }
-                };
-                string ttsEnding = string.Empty;
-                var nextNewsArticle = _newsService.GetNextPopularNewsArticle(fromDate, newsArticle.Id);
-                SessionState sessionState = null;
-                if (nextNewsArticle != null)
-                {
-                    ttsEnding = $" {AliceTtsHelper.GetSilenceString(500)} для перехода к следующий новости скажите: дальше";
-                    buttons.Add(new AliceButtonModel()
-                    {
-                        Title = "дальше",
-                        Payload = new AliceCommand(AliceCommandType.BestComments, nextNewsArticle.Id),
-                        Hide = true
-                    });
-                    sessionState = new SessionState()
-                    {
-                        NextNewsArticleId = nextNewsArticle.Id
+                        new AliceButtonModel()
+                        {
+                            Title = "к новости",
+                            Url = newsArticle.Url,
+                            Hide = true
+                        }
                     };
-
-                }
-                buttons.Add(new AliceButtonModel()
-                {
-                    Title = AliceCommandsTitle.LatestNews,
-                    Payload = new AliceCommand(AliceCommandType.LatestNews),
-                    Hide = true
-                });
-                buttons.Add(new AliceButtonModel()
-                {
-                    Title = AliceCommandsTitle.MainNews,
-                    Payload = new AliceCommand(AliceCommandType.MainNews),
-                    Hide = true
-                });
-
-                var text = new StringBuilder($"Лучшие комментарии под новостью \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
-                var tts = new StringBuilder($"Лучшие комментарии под новостью \"{newsArticle.Title}\": sil <[500]> ");
-                foreach (var comment in comments)
-                {
-                    string textComment = $"\n\n{EmojiLibrary.SpeechBalloon} {comment.CommentText} {EmojiLibrary.ThumbsUp}{comment.CommentRating}";
-                    string textTts = $" sil <[500]>  {comment.CommentText}";
-                    if (text.Length + textComment.Length <= AliceResponseModel.TextMaxLenght
-                        && tts.Length + textTts.Length + ttsEnding.Length <= AliceResponseModel.TtsMaxLenght)
+                    string ttsEnding = string.Empty;
+                    var nextNewsArticle = _newsService.GetNextPopularNewsArticle(fromDate, newsArticle.Id);
+                    SessionState sessionState = null;
+                    if (nextNewsArticle != null)
                     {
-                        text.Append(textComment);
-                        tts.Append(textTts);
-                    }
-                }
-                tts.Append(ttsEnding);
+                        ttsEnding = $" {AliceTtsHelper.GetSilenceString(500)} для перехода к следующий новости скажите: дальше";
+                        buttons.Add(new AliceButtonModel()
+                        {
+                            Title = "дальше",
+                            Payload = new AliceCommand(AliceCommandType.BestComments, nextNewsArticle.Id),
+                            Hide = true
+                        });
+                        sessionState = new SessionState()
+                        {
+                            NextNewsArticleId = nextNewsArticle.Id
+                        };
 
-                var response = new AliceResponse(aliceRequest, text.ToString(), tts.ToString(), buttons);
-                response.SessionState = sessionState;
-                return response;
-            }
-            else
-            {
-                var buttons = new List<AliceButtonModel>()
-                {
-                    new AliceButtonModel()
+                    }
+                    buttons.Add(new AliceButtonModel()
                     {
                         Title = AliceCommandsTitle.LatestNews,
                         Payload = new AliceCommand(AliceCommandType.LatestNews),
                         Hide = true
-                    },
-                    new AliceButtonModel()
+                    });
+                    buttons.Add(new AliceButtonModel()
                     {
                         Title = AliceCommandsTitle.MainNews,
                         Payload = new AliceCommand(AliceCommandType.MainNews),
                         Hide = true
+                    });
+
+                    var text = new StringBuilder($"Лучшие комментарии под новостью \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
+                    var tts = new StringBuilder($"Лучшие комментарии под новостью \"{newsArticle.Title}\": sil <[500]> ");
+                    foreach (var comment in comments)
+                    {
+                        string textComment = $"\n\n{EmojiLibrary.SpeechBalloon} {comment.CommentText} {EmojiLibrary.ThumbsUp}{comment.CommentRating}";
+                        string textTts = $" sil <[500]>  {comment.CommentText}";
+                        if (text.Length + textComment.Length <= AliceResponseModel.TextMaxLenght
+                            && tts.Length + textTts.Length + ttsEnding.Length <= AliceResponseModel.TtsMaxLenght)
+                        {
+                            text.Append(textComment);
+                            tts.Append(textTts);
+                        }
                     }
-                };
-                return new AliceResponse(aliceRequest, "У меня нет лучших комментариев", buttons);
+                    tts.Append(ttsEnding);
+
+                    var response = new AliceResponse(aliceRequest, text.ToString(), tts.ToString(), buttons);
+                    response.SessionState = sessionState;
+                    return response;
+                }
             }
+            var noResponseButtons = new List<AliceButtonModel>()
+            {
+                new AliceButtonModel()
+                {
+                    Title = AliceCommandsTitle.LatestNews,
+                    Payload = new AliceCommand(AliceCommandType.LatestNews),
+                    Hide = true
+                },
+                new AliceButtonModel()
+                {
+                    Title = AliceCommandsTitle.MainNews,
+                    Payload = new AliceCommand(AliceCommandType.MainNews),
+                    Hide = true
+                }
+            };
+            return new AliceResponse(aliceRequest, "У меня нет лучших комментариев", noResponseButtons);
         }
 
         private AliceResponseBase GetHelp(AliceRequest aliceRequest)

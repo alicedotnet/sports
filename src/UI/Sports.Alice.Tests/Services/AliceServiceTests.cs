@@ -25,10 +25,10 @@ namespace Sports.Alice.Tests.Services
         private readonly SportsSettings _sportsSettings;
         private readonly IServiceProvider _services;
 
-        public AliceServiceTests(MockContextFixture mockContextFixture, ITestOutputHelper testOutputHelper)
+        public AliceServiceTests(ServerFixture serverFixture, ITestOutputHelper testOutputHelper)
             : base(testOutputHelper)
         {
-            _services = mockContextFixture.Services;
+            _services = serverFixture.Services;
             _sportsSettings = _services.GetService<IOptions<SportsSettings>>().Value;
         }
 

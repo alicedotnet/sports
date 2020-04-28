@@ -8,8 +8,7 @@ namespace Sports.Alice.Tests.TestsInfrastructure.Collections
 {
     [CollectionDefinition(TestsConstants.ServerCollectionName)]
     public class ServerCollection : 
-        ICollectionFixture<ServerFixture>,
-        ICollectionFixture<MockContextFixture>
+        ICollectionFixture<ServerFixture>
     {
     }
 }

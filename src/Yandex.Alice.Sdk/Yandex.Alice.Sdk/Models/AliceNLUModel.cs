@@ -9,10 +9,10 @@ namespace Yandex.Alice.Sdk.Models
     public class AliceNLUModel
     {
         [JsonPropertyName("tokens")]
-        public string[] Tokens { get; set; }
+        public IEnumerable<string> Tokens { get; set; }
 
         [JsonPropertyName("entities")]
         [JsonConverter(typeof(AliceEntityModelConverter))]
-        public AliceEntityModel[] Entities { get; set; }
+        public IEnumerable<AliceEntityModel> Entities { get; set; }
     }
 }

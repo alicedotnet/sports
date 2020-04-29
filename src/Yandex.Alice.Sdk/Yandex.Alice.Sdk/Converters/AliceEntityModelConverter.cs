@@ -6,7 +6,7 @@ using Yandex.Alice.Sdk.Models;
 
 namespace Yandex.Alice.Sdk.Converters
 {
-    public class AliceEntityModelConverter : ArrayConverter<AliceEntityModel>
+    public class AliceEntityModelConverter : EnumerableConverter<AliceEntityModel>
     {
         private static readonly Dictionary<string, Type> _typeMap = new Dictionary<string, Type>()
         {

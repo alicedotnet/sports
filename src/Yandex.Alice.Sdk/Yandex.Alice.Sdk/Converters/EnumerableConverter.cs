@@ -7,14 +7,14 @@ using System.Text.Json.Serialization;
 
 namespace Yandex.Alice.Sdk.Converters
 {
-    public abstract class ArrayConverter<TItem> : JsonConverter<TItem[]>
+    public abstract class EnumerableConverter<TItem> : JsonConverter<IEnumerable<TItem>>
     {
-        public ArrayConverter() : this(true) { }
-        public ArrayConverter(bool canWrite) => CanWrite = canWrite;
+        public EnumerableConverter() : this(true) { }
+        public EnumerableConverter(bool canWrite) => CanWrite = canWrite;
 
         public bool CanWrite { get; }
 
-        public override TItem[] Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override IEnumerable<TItem> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             switch (reader.TokenType)
             {
@@ -35,7 +35,7 @@ namespace Yandex.Alice.Sdk.Converters
         protected abstract TItem ToItem(ref Utf8JsonReader reader, JsonSerializerOptions options);
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "<Pending>")]
-        public override void Write(Utf8JsonWriter writer, TItem[] value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, IEnumerable<TItem> value, JsonSerializerOptions options)
         {
             if(value != null && CanWrite)
             {

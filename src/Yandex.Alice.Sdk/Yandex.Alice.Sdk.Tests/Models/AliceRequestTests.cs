@@ -39,6 +39,12 @@ namespace Yandex.Alice.Sdk.Tests.Models
             Assert.NotNull(aliceRequest.Session.Application);
             Assert.NotEmpty(aliceRequest.Session.Application.ApplicationId);
             Assert.True(aliceRequest.Session.New);
+            Assert.NotNull(aliceRequest.Request);
+            Assert.NotNull(aliceRequest.Request.Nlu);
+            Assert.NotNull(aliceRequest.Request.Nlu.Tokens);
+            Assert.NotEmpty(aliceRequest.Request.Nlu.Tokens);
+            Assert.NotNull(aliceRequest.Request.Nlu.Entities);
+            Assert.NotEmpty(aliceRequest.Request.Nlu.Entities);
             WritePrettyJson(aliceRequest);
         }
 

@@ -10,7 +10,7 @@ namespace Yandex.Alice.Sdk.Models
 {
     public abstract class AliceModel
     {
-        protected void ValidateMaxLength(string value, int maxLength, [CallerMemberName] string propertyName = null)
+        protected static void ValidateMaxLength(string value, int maxLength, [CallerMemberName] string propertyName = null)
         {
             if (value?.Length > maxLength)
             {

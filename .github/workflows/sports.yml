@@ -14,9 +14,7 @@ env:
 
 jobs:
   build:
-
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
@@ -36,6 +34,7 @@ jobs:
         path: sports
         
   deploy:
+    needs: build
     runs-on: windows-latest
     steps:
     - name: 'Download a Build Artifact'

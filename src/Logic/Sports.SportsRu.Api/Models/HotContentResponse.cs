@@ -8,6 +8,6 @@ namespace Sports.SportsRu.Api.Models
     public class HotContentResponse
     {
         [JsonPropertyName("news")]
-        public int[] News { get; set; }
+        public IEnumerable<int> News { get; set; }
     }
 }

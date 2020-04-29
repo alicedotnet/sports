@@ -24,9 +24,11 @@ namespace Yandex.Alice.Sdk.Models
             Payload = new object();
         }
 
-        public AliceButtonModel(string title)
+        public AliceButtonModel(string title, object payload, bool hide)
         {
             Title = title;
+            Payload = payload;
+            Hide = hide;
         }
     }
 }

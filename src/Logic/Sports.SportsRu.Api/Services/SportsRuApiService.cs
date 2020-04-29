@@ -56,7 +56,8 @@ namespace Sports.SportsRu.Api.Services
                     break;
             }
             string args = HttpHelper.UrlEncodeJson(newsRequest);
-            var response = await _httpClient.GetAsync($"core/news/list?args={args}").ConfigureAwait(false);
+            var uri = new Uri($"core/news/list?args={args}", UriKind.Relative);
+            var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
             string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {                
@@ -86,7 +87,8 @@ namespace Sports.SportsRu.Api.Services
             }
 
             string args = HttpHelper.UrlEncodeJson(commentsIdsRequest);
-            var response = await _httpClient.GetAsync($"core/api/comment/get_ids?args={args}").ConfigureAwait(false);
+            var uri = new Uri($"core/api/comment/get_ids?args={args}", UriKind.Relative);
+            var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
             string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
@@ -99,7 +101,8 @@ namespace Sports.SportsRu.Api.Services
         public async Task<ServiceResponse<CommentByIdsResponse>> GetCommentsByIds(IEnumerable<int> ids)
         {
             string commentsIds = string.Join(",", ids);
-            var response = await _httpClient.GetAsync($"api/comment/get/by_ids.json?comment_ids={commentsIds}&style=newjs").ConfigureAwait(false);
+            var uri = new Uri($"api/comment/get/by_ids.json?comment_ids={commentsIds}&style=newjs", UriKind.Relative);
+            var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
             string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
@@ -111,7 +114,8 @@ namespace Sports.SportsRu.Api.Services
 
         public async Task<ServiceResponse<HotContentResponse>> GetHotContent()
         {
-            var response = await _statHttpClient.GetAsync("api/ru/hot_content/?metod_id=1").ConfigureAwait(false);
+            var uri = new Uri("api/ru/hot_content/?metod_id=1", UriKind.Relative);
+            var response = await _statHttpClient.GetAsync(uri).ConfigureAwait(false);
             string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if(response.IsSuccessStatusCode)
             {
@@ -131,6 +135,7 @@ namespace Sports.SportsRu.Api.Services
                 if (disposing)
                 {
                     _httpClient.Dispose();
+                    _statHttpClient.Dispose();
                 }
 
                 _disposedValue = true;

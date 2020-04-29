@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sports.Alice.Models
 {
-    public class SessionState
+    public class CustomSessionState
     {
         [JsonPropertyName("nextNewsArticleId")]
         public Guid NextNewsArticleId { get; set; }

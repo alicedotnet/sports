@@ -29,7 +29,7 @@ namespace Sports.Services
         {
             var newsResponse = await _sportsRuApiService.GetNewsAsync(NewsType.HomePage, NewsPriority.Main, NewsContentOrigin.Mixed, 100).ConfigureAwait(false);
             var hotContent = await _sportsRuApiService.GetHotContent().ConfigureAwait(false);
-            var hotNews = Array.Empty<int>();
+            IEnumerable<int> hotNews = null;
             if(hotContent.IsSuccess)
             {
                 hotNews = hotContent.Content.News;
@@ -117,9 +117,9 @@ namespace Sports.Services
             return value.Replace("<br />", "\n", StringComparison.OrdinalIgnoreCase);
         }
 
-        private bool IsHotContent(int newsArticleId, int[] hotNews)
+        private bool IsHotContent(int newsArticleId, IEnumerable<int> hotNews)
         {
-            return hotNews.Contains(newsArticleId);
+            return hotNews != null && hotNews.Contains(newsArticleId);
         }
 
         public void DeleteOldData(DateTimeOffset oldestDateToKeep)

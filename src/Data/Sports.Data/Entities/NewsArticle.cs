@@ -13,6 +13,8 @@ namespace Sports.Data.Entities
         public string ExternalId { get; set; }
         public bool IsHotContent { get; set; }
         public int CommentsCount { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "<Pending>")]
         public virtual ICollection<NewsArticleComment> Comments { get; set; }
     }
 }

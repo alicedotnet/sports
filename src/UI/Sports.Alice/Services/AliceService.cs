@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Sports.Alice.Models;
 using Sports.Alice.Models.Settings;
+using Sports.Alice.Resources;
 using Sports.Alice.Services.Interfaces;
 using Sports.Common.Extensions;
 using Sports.Models;
@@ -72,50 +73,36 @@ namespace Sports.Alice.Services
                 aliceRequest.State.Session is JsonElement sessionElement &&
                 sessionElement.ValueKind == JsonValueKind.Object)
             {
-                var state = sessionElement.ToObject<SessionState>();
+                var state = sessionElement.ToObject<CustomSessionState>();
                 aliceCommand.Type = AliceCommandType.BestComments;
                 aliceCommand.Payload = state.NextNewsArticleId;
             }
 
-            switch (aliceCommand.Type)
+            return aliceCommand.Type switch
             {
-                case AliceCommandType.LatestNews:
-                    return GetLatestNews(aliceRequest);
-                case AliceCommandType.MainNews:
-                    return GetMainNews(aliceRequest);
-                case AliceCommandType.BestComments:
-                    return GetBestComments(aliceRequest, aliceCommand.Payload);
-                default:
-                    return GetHelp(aliceRequest);
-            }
+                AliceCommandType.LatestNews => GetLatestNews(aliceRequest),
+                AliceCommandType.MainNews => GetMainNews(aliceRequest),
+                AliceCommandType.BestComments => GetBestComments(aliceRequest, aliceCommand.Payload),
+                _ => GetHelp(aliceRequest),
+            };
         }
 
         private AliceResponseBase GetLatestNews(AliceRequest aliceRequest)
         {
             var buttons = new List<AliceButtonModel>()
                 {
-                    new AliceButtonModel()
-                    {
-                        Title = AliceCommandsTitle.MainNews,
-                        Payload = new AliceCommand(AliceCommandType.MainNews),
-                        Hide = true
-                    },
-                    new AliceButtonModel()
-                    {
-                        Title = AliceCommandsTitle.BestComments,
-                        Payload = new AliceCommand(AliceCommandType.BestComments),
-                        Hide = true
-                    }
+                    new AliceButtonModel(Sports_Resources.Command_MainNews, new AliceCommand(AliceCommandType.MainNews), true),
+                    new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(AliceCommandType.BestComments),true)
                 };
             var news = _newsService.GetLatestNews(_sportsSettings.NewsToDisplay);
             if (news.Any())
             {
                 var titles = news.Select(x => x.Title);
-                string text = "Вот последние новости\n\n" + string.Join("\n\n", titles);
-                string tts = "Вот последние новости. " + string.Join(AliceTtsHelper.GetSilenceString(500), titles) + " sil <[1000]> Чтобы узнать дополнительные возможности скажите: помощь";
+                string text = $"{Sports_Resources.LatestNews_Header_Tts}\n\n{string.Join("\n\n", titles)}";
+                string tts = $"{Sports_Resources.LatestNews_Header_Tts}{AliceTtsHelper.SilenceString500}{string.Join(AliceTtsHelper.SilenceString500, titles)}{AliceTtsHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
                 var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
                 response.Response.Card.Items = new List<AliceGalleryCardItem>();
-                response.Response.Card.Header = new AliceGalleryCardHeaderModel("Последние новости");
+                response.Response.Card.Header = new AliceGalleryCardHeaderModel(Sports_Resources.LatestNews_Header);
                 foreach (var newsArticle in news)
                 {
                     response.Response.Card.Items.Add(new AliceGalleryCardItem()
@@ -132,7 +119,7 @@ namespace Sports.Alice.Services
             }
             else
             {
-                return new AliceResponse(aliceRequest, "У меня нет последний новостей", buttons);
+                return new AliceResponse(aliceRequest, Sports_Resources.LatestNews_NoNews, buttons);
             }
         }
 
@@ -140,28 +127,18 @@ namespace Sports.Alice.Services
         {
             var buttons = new List<AliceButtonModel>()
                 {
-                    new AliceButtonModel()
-                    {
-                        Title = AliceCommandsTitle.LatestNews,
-                        Payload = new AliceCommand(AliceCommandType.LatestNews),
-                        Hide = true
-                    },
-                    new AliceButtonModel()
-                    {
-                        Title = AliceCommandsTitle.BestComments,
-                        Payload = new AliceCommand(AliceCommandType.BestComments),
-                        Hide = true
-                    }
+                    new AliceButtonModel(Sports_Resources.Command_LatestNews, new AliceCommand(AliceCommandType.LatestNews), true),
+new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(AliceCommandType.BestComments),true)
                 };
             var news = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), _sportsSettings.NewsToDisplay);
             if (news.Any())
             {
                 var titles = news.Select(x => x.Title);
-                string text = "Вот главные новости\n\n" + string.Join("\n\n", titles);
-                string tts = "Вот главные новости. " + string.Join(AliceTtsHelper.GetSilenceString(500), titles) + " sil <[1000]> Чтобы узнать дополнительные возможности скажите: помощь";
+                string text = $"{Sports_Resources.MainNews_Header_Tts}\n\n{string.Join("\n\n", titles)}";
+                string tts = $"{Sports_Resources.MainNews_Header_Tts}{AliceTtsHelper.SilenceString500}{string.Join(AliceTtsHelper.SilenceString500, titles)}{AliceTtsHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
                 var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
                 response.Response.Card.Items = new List<AliceGalleryCardItem>();
-                response.Response.Card.Header = new AliceGalleryCardHeaderModel("Главные новости");
+                response.Response.Card.Header = new AliceGalleryCardHeaderModel(Sports_Resources.MainNews_Header);
                 foreach (var newsArticle in news)
                 {
                     response.Response.Card.Items.Add(new AliceGalleryCardItem()
@@ -178,7 +155,7 @@ namespace Sports.Alice.Services
             }
             else
             {
-                return new AliceResponse(aliceRequest, "У меня нет главных новостей", buttons);
+                return new AliceResponse(aliceRequest, Sports_Resources.MainNews_NoNews, buttons);
             }
         }
 
@@ -205,48 +182,38 @@ namespace Sports.Alice.Services
                     {
                         new AliceButtonModel()
                         {
-                            Title = "к новости",
+                            Title = Sports_Resources.Command_BestComments_OpenNewsArticle,
                             Url = newsArticle.Url,
                             Hide = true
                         }
                     };
                     string ttsEnding = string.Empty;
                     var nextNewsArticle = _newsService.GetNextPopularNewsArticle(fromDate, newsArticle.Id);
-                    SessionState sessionState = null;
+                    CustomSessionState sessionState = null;
                     if (nextNewsArticle != null)
                     {
-                        ttsEnding = $" {AliceTtsHelper.GetSilenceString(500)} для перехода к следующий новости скажите: дальше";
+                        ttsEnding = $"{AliceTtsHelper.SilenceString500}{Sports_Resources.Tips_BestComments_Next}";
                         buttons.Add(new AliceButtonModel()
                         {
-                            Title = "дальше",
+                            Title = Sports_Resources.Command_BestComments_Next,
                             Payload = new AliceCommand(AliceCommandType.BestComments, nextNewsArticle.Id),
                             Hide = true
                         });
-                        sessionState = new SessionState()
+                        sessionState = new CustomSessionState()
                         {
                             NextNewsArticleId = nextNewsArticle.Id
                         };
 
                     }
-                    buttons.Add(new AliceButtonModel()
-                    {
-                        Title = AliceCommandsTitle.LatestNews,
-                        Payload = new AliceCommand(AliceCommandType.LatestNews),
-                        Hide = true
-                    });
-                    buttons.Add(new AliceButtonModel()
-                    {
-                        Title = AliceCommandsTitle.MainNews,
-                        Payload = new AliceCommand(AliceCommandType.MainNews),
-                        Hide = true
-                    });
+                    buttons.Add(new AliceButtonModel(Sports_Resources.Command_LatestNews, new AliceCommand(AliceCommandType.LatestNews), true));
+                    buttons.Add(new AliceButtonModel(Sports_Resources.Command_MainNews, new AliceCommand(AliceCommandType.MainNews), true));
 
-                    var text = new StringBuilder($"Лучшие комментарии под новостью \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
-                    var tts = new StringBuilder($"Лучшие комментарии под новостью \"{newsArticle.Title}\": sil <[500]> ");
+                    var text = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
+                    var tts = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title}\"{AliceTtsHelper.SilenceString500}");
                     foreach (var comment in comments)
                     {
                         string textComment = $"\n\n{EmojiLibrary.SpeechBalloon} {comment.CommentText} {EmojiLibrary.ThumbsUp}{comment.CommentRating}";
-                        string textTts = $" sil <[500]>  {comment.CommentText}";
+                        string textTts = $"{AliceTtsHelper.SilenceString500}{comment.CommentText}";
                         if (text.Length + textComment.Length <= AliceResponseModel.TextMaxLenght
                             && tts.Length + textTts.Length + ttsEnding.Length <= AliceResponseModel.TtsMaxLenght)
                         {
@@ -256,55 +223,33 @@ namespace Sports.Alice.Services
                     }
                     tts.Append(ttsEnding);
 
-                    var response = new AliceResponse(aliceRequest, text.ToString(), tts.ToString(), buttons);
-                    response.SessionState = sessionState;
+                    var response = new AliceResponse(aliceRequest, text.ToString(), tts.ToString(), buttons)
+                    {
+                        SessionState = sessionState
+                    };
                     return response;
                 }
             }
             var noResponseButtons = new List<AliceButtonModel>()
             {
-                new AliceButtonModel()
-                {
-                    Title = AliceCommandsTitle.LatestNews,
-                    Payload = new AliceCommand(AliceCommandType.LatestNews),
-                    Hide = true
-                },
-                new AliceButtonModel()
-                {
-                    Title = AliceCommandsTitle.MainNews,
-                    Payload = new AliceCommand(AliceCommandType.MainNews),
-                    Hide = true
-                }
+                new AliceButtonModel(Sports_Resources.Command_LatestNews, new AliceCommand(AliceCommandType.LatestNews), true),
+                new AliceButtonModel(Sports_Resources.Command_MainNews, new AliceCommand(AliceCommandType.MainNews), true)
             };
-            return new AliceResponse(aliceRequest, "У меня нет лучших комментариев", noResponseButtons);
+            return new AliceResponse(aliceRequest, Sports_Resources.BestComments_NoComments, noResponseButtons);
         }
 
         private AliceResponseBase GetHelp(AliceRequest aliceRequest)
         {
             var buttons = new List<AliceButtonModel>()
                 {
-                    new AliceButtonModel()
-                    {
-                        Title = AliceCommandsTitle.LatestNews,
-                        Payload = new AliceCommand(AliceCommandType.LatestNews)
-                    },
-                    new AliceButtonModel()
-                    {
-                        Title = AliceCommandsTitle.MainNews,
-                        Payload = new AliceCommand(AliceCommandType.MainNews)
-                    },
-                    new AliceButtonModel()
-                    {
-                        Title = AliceCommandsTitle.BestComments,
-                        Payload = new AliceCommand(AliceCommandType.BestComments),
-                        Hide = true
-                    }
+                    new AliceButtonModel(Sports_Resources.Command_LatestNews, new AliceCommand(AliceCommandType.LatestNews), false),
+                    new AliceButtonModel(Sports_Resources.Command_MainNews, new AliceCommand(AliceCommandType.MainNews), false),
+                    new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(AliceCommandType.BestComments), false)
                 };
-            string text = "Вы можете попросить меня прочитать последние новости спорта сказав фразу: последние новости, главные новости с помощью фразы: главные новости или лучшие комментарии с помощью фразы: лучшие комментарии";
-            return new AliceResponse(aliceRequest, text, buttons);
+            return new AliceResponse(aliceRequest, Sports_Resources.Help_Text_Tts, buttons);
         }
 
-        private string GetTitleEnding(NewsArticleModel newsArticle)
+        private static string GetTitleEnding(NewsArticleModel newsArticle)
         {
             return newsArticle.IsHotContent ? $" {EmojiLibrary.FireEmoji} {newsArticle.CommentsCount}"
                 : newsArticle.CommentsCount > 0 ? $" {EmojiLibrary.SpeechBalloon} {newsArticle.CommentsCount} "

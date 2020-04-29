@@ -64,11 +64,23 @@ namespace Sports.Tests.Services
         [Fact]
         public void DeleteAfterDate()
         {
-            _sportsContext.NewsArticles.Add(new NewsArticle() 
-                { Title = "test", PublishedDate = DateTime.Now.AddDays(-1) });
+            var newsArticle = new NewsArticle()
+            { Title = "test", PublishedDate = DateTime.Now.AddDays(-1) };
+            _sportsContext.NewsArticles.Add(newsArticle);
+
+            Assert.NotEqual(Guid.Empty, newsArticle.NewsArticleId);
+            _sportsContext.NewsArticlesComments.Add(new NewsArticleComment()
+            {
+                NewsArticleId = newsArticle.NewsArticleId,
+                Text = string.Empty
+            });
+
             _sportsContext.SaveChanges();
+
+            Assert.True(_sportsContext.NewsArticlesComments.Any());
             Assert.True(_sportsContext.NewsArticles.Any());
             _syncService.DeleteOldData(DateTimeOffset.Now);
+            Assert.False(_sportsContext.NewsArticlesComments.Any());
             Assert.False(_sportsContext.NewsArticles.Any());
         }
     }

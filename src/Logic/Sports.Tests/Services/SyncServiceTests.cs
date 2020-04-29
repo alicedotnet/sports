@@ -39,8 +39,6 @@ namespace Sports.Tests.Services
             var article = _sportsContext.NewsArticles.First();
             Assert.NotNull(article.ExternalId);
             Assert.NotNull(article.PublishedDate);
-
-            WritePrettyJson(article);
         }
 
         [Fact]

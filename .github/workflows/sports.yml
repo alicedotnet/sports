@@ -27,11 +27,25 @@ jobs:
       run: dotnet restore ./src
     - name: test
       run: dotnet test ./src -c Release
-    - name: Build
-      run: dotnet publish -c Release -o myapp ./src/UI/Sports.Alice/Sports.Alice.csproj
+    - name: publish site
+      run: dotnet publish -c Release -o sports ./src/UI/Sports.Alice/Sports.Alice.csproj
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2
+      with: 
+        name: sports
+        path: sports
+        
+  deploy:
+    runs-on: windows-latest
+    steps:
+    - name: 'Download a Build Artifact'
+      uses: actions/download-artifact@v2
+      with:
+        name: sports
+        path: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/sports'
     - name: 'Run Azure webapp deploy action using publish profile credentials'
       uses: azure/webapps-deploy@v2
       with: 
         app-name: ${{ env.AZURE_WEBAPP_NAME }} # Replace with your app name
         publish-profile: ${{ secrets.publish_profile  }} # Define secret variable in repository settings as per action documentation
-        package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp'
+        package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/sports'

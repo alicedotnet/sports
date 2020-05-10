@@ -2,6 +2,7 @@
 using Sports.Data.Context;
 using Sports.Data.Entities;
 using Sports.Services.Interfaces;
+using Sports.SportsRu.Api.Helpers;
 using Sports.SportsRu.Api.Models;
 using Sports.SportsRu.Api.Services.Interfaces;
 using System;
@@ -44,7 +45,8 @@ namespace Sports.Services
                 foreach (var newsArticle in newsResponse.Content)
                 {
                     if(newsArticle.BodyIsEmpty ||
-                        newsArticle.ContentOption?.Name == "special") //usually this is not a news article but some promotion
+                        newsArticle.ContentOption?.Name == "special" ||
+                        !SportsRuHelper.IsInternalUrl(newsArticle.DesktopUrl)) //usually this is not a news article but some promotion
                     {
                         continue;
                     }

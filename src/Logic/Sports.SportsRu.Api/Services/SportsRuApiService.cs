@@ -5,6 +5,7 @@ using Sports.SportsRu.Api.Models;
 using Sports.SportsRu.Api.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -67,7 +68,7 @@ namespace Sports.SportsRu.Api.Services
             return ServiceResponseFactory.Error<NewsResponseCollection>(content);
         }
 
-        public async Task<ServiceResponse<CommentIdsResponseCollection>> GetCommentsIdsAsync(int messageId, MessageClass messageClass, Sort sort)
+        public async Task<ServiceResponse<CommentIdsResponseCollection>> GetCommentsIdsAsync(int messageId, MessageClass messageClass, Sort sort, int commentsCount = 10)
         {
             var commentsIdsRequest = new CommentIdsRequest()
             {
@@ -93,7 +94,8 @@ namespace Sports.SportsRu.Api.Services
             if (response.IsSuccessStatusCode)
             {
                 var commentIdsResponse = JsonSerializer.Deserialize<CommentIdsResponseCollection>(content);
-                return ServiceResponseFactory.Success(commentIdsResponse);
+                var commentIdsResponseShort = new CommentIdsResponseCollection(commentIdsResponse.Take(commentsCount));
+                return ServiceResponseFactory.Success(commentIdsResponseShort);
             }
             return ServiceResponseFactory.Error<CommentIdsResponseCollection>(content);
         }

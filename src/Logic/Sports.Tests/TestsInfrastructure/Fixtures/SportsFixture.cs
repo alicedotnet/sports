@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Sports.Data.Context;
 using Sports.Services;
 using Sports.Services.Interfaces;
@@ -25,7 +27,8 @@ namespace Sports.Tests.TestsInfrastructure.Fixtures
 
             ISportsRuApiService sportsRuApiService = new SportsRuApiService();
             NewsService = new NewsService(SportsContext);
-            SyncService = new SyncService(SportsContext, sportsRuApiService, NewsService);
+            var logger = Mock.Of<ILogger<SyncService>>();
+            SyncService = new SyncService(SportsContext, sportsRuApiService, NewsService, logger);
             NewsArticleCommentService = new NewsArticleCommentService(SportsContext);
         }
     }

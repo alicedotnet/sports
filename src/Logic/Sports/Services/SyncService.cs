@@ -1,4 +1,5 @@
-﻿using Sports.Data.Context;
+﻿using Microsoft.Extensions.Logging;
+using Sports.Data.Context;
 using Sports.Data.Entities;
 using Sports.Services.Interfaces;
 using Sports.SportsRu.Api.Models;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Sports.Services
@@ -17,12 +19,15 @@ namespace Sports.Services
         private readonly SportsContext _sportsContext;
         private readonly ISportsRuApiService _sportsRuApiService;
         private readonly INewsService _newsService;
+        private readonly ILogger<SyncService> _logger;
 
-        public SyncService(SportsContext sportsContext, ISportsRuApiService sportsRuApiService, INewsService newsService)
+        public SyncService(SportsContext sportsContext, ISportsRuApiService sportsRuApiService
+            , INewsService newsService, ILogger<SyncService> logger)
         {
             _sportsContext = sportsContext;
             _sportsRuApiService = sportsRuApiService;
             _newsService = newsService;
+            _logger = logger;
         }
 
         public async Task SyncNewsAsync()
@@ -105,6 +110,10 @@ namespace Sports.Services
                                     _sportsContext.NewsArticlesComments.Update(existingComment);
                                 }
                             }
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"Can't get comments by ids.\nRequest data: {JsonSerializer.Serialize(commentsIdsResponse.Content)}.\nResponse data: {commentsByIdsResponse.ErrorMessage}");
                         }
                     }
                 }

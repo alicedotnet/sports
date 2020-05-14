@@ -91,8 +91,8 @@ namespace Sports.Alice.Services
         {
             var buttons = new List<AliceButtonModel>()
                 {
-                    new AliceButtonModel(Sports_Resources.Command_MainNews, new AliceCommand(AliceCommandType.MainNews), true),
-                    new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(AliceCommandType.BestComments),true)
+                    new AliceButtonModel(Sports_Resources.Command_MainNews, true, new AliceCommand(AliceCommandType.MainNews), null),
+                    new AliceButtonModel(Sports_Resources.Command_BestComments, true, new AliceCommand(AliceCommandType.BestComments), null)
                 };
             var news = _newsService.GetLatestNews(_sportsSettings.NewsToDisplay);
             if (news.Any())
@@ -101,8 +101,11 @@ namespace Sports.Alice.Services
                 string text = $"{Sports_Resources.LatestNews_Header_Tts}\n\n{string.Join("\n\n", titles)}";
                 string tts = $"{Sports_Resources.LatestNews_Header_Tts}{AliceTtsHelper.SilenceString500}{string.Join(AliceTtsHelper.SilenceString500, titles)}{AliceTtsHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
                 var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
-                response.Response.Card.Items = new List<AliceGalleryCardItem>();
-                response.Response.Card.Header = new AliceGalleryCardHeaderModel(Sports_Resources.LatestNews_Header);
+                response.Response.Card = new AliceGalleryCardModel
+                {
+                    Items = new List<AliceGalleryCardItem>(),
+                    Header = new AliceGalleryCardHeaderModel(Sports_Resources.LatestNews_Header)
+                };
                 foreach (var newsArticle in news)
                 {
                     response.Response.Card.Items.Add(new AliceGalleryCardItem()
@@ -127,8 +130,8 @@ namespace Sports.Alice.Services
         {
             var buttons = new List<AliceButtonModel>()
                 {
-                    new AliceButtonModel(Sports_Resources.Command_LatestNews, new AliceCommand(AliceCommandType.LatestNews), true),
-new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(AliceCommandType.BestComments),true)
+                    new AliceButtonModel(Sports_Resources.Command_LatestNews, true, new AliceCommand(AliceCommandType.LatestNews), null),
+                    new AliceButtonModel(Sports_Resources.Command_BestComments, true, new AliceCommand(AliceCommandType.BestComments), null)
                 };
             var news = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), _sportsSettings.NewsToDisplay);
             if (news.Any())
@@ -137,8 +140,11 @@ new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(Ali
                 string text = $"{Sports_Resources.MainNews_Header_Tts}\n\n{string.Join("\n\n", titles)}";
                 string tts = $"{Sports_Resources.MainNews_Header_Tts}{AliceTtsHelper.SilenceString500}{string.Join(AliceTtsHelper.SilenceString500, titles)}{AliceTtsHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
                 var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
-                response.Response.Card.Items = new List<AliceGalleryCardItem>();
-                response.Response.Card.Header = new AliceGalleryCardHeaderModel(Sports_Resources.MainNews_Header);
+                response.Response.Card = new AliceGalleryCardModel
+                {
+                    Items = new List<AliceGalleryCardItem>(),
+                    Header = new AliceGalleryCardHeaderModel(Sports_Resources.MainNews_Header)
+                };
                 foreach (var newsArticle in news)
                 {
                     response.Response.Card.Items.Add(new AliceGalleryCardItem()
@@ -205,8 +211,8 @@ new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(Ali
                         };
 
                     }
-                    buttons.Add(new AliceButtonModel(Sports_Resources.Command_LatestNews, new AliceCommand(AliceCommandType.LatestNews), true));
-                    buttons.Add(new AliceButtonModel(Sports_Resources.Command_MainNews, new AliceCommand(AliceCommandType.MainNews), true));
+                    buttons.Add(new AliceButtonModel(Sports_Resources.Command_LatestNews, true, new AliceCommand(AliceCommandType.LatestNews), null));
+                    buttons.Add(new AliceButtonModel(Sports_Resources.Command_MainNews, true, new AliceCommand(AliceCommandType.MainNews), null));
 
                     var text = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
                     var tts = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title}\"{AliceTtsHelper.SilenceString500}");
@@ -232,8 +238,8 @@ new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(Ali
             }
             var noResponseButtons = new List<AliceButtonModel>()
             {
-                new AliceButtonModel(Sports_Resources.Command_LatestNews, new AliceCommand(AliceCommandType.LatestNews), true),
-                new AliceButtonModel(Sports_Resources.Command_MainNews, new AliceCommand(AliceCommandType.MainNews), true)
+                new AliceButtonModel(Sports_Resources.Command_LatestNews, true, new AliceCommand(AliceCommandType.LatestNews), null),
+                new AliceButtonModel(Sports_Resources.Command_MainNews, true, new AliceCommand(AliceCommandType.MainNews), null)
             };
             return new AliceResponse(aliceRequest, Sports_Resources.BestComments_NoComments, noResponseButtons);
         }
@@ -242,9 +248,9 @@ new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(Ali
         {
             var buttons = new List<AliceButtonModel>()
                 {
-                    new AliceButtonModel(Sports_Resources.Command_LatestNews, new AliceCommand(AliceCommandType.LatestNews), false),
-                    new AliceButtonModel(Sports_Resources.Command_MainNews, new AliceCommand(AliceCommandType.MainNews), false),
-                    new AliceButtonModel(Sports_Resources.Command_BestComments, new AliceCommand(AliceCommandType.BestComments), false)
+                    new AliceButtonModel(Sports_Resources.Command_LatestNews, false, new AliceCommand(AliceCommandType.LatestNews), null),
+                    new AliceButtonModel(Sports_Resources.Command_MainNews, false, new AliceCommand(AliceCommandType.MainNews), null),
+                    new AliceButtonModel(Sports_Resources.Command_BestComments, false, new AliceCommand(AliceCommandType.BestComments), null)
                 };
             return new AliceResponse(aliceRequest, Sports_Resources.Help_Text_Tts, buttons);
         }

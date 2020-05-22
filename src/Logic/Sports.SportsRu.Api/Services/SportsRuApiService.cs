@@ -1,4 +1,5 @@
-﻿using Sports.Common.Factories;
+﻿using Microsoft.Extensions.Logging;
+using Sports.Common.Factories;
 using Sports.Common.Models;
 using Sports.SportsRu.Api.Helpers;
 using Sports.SportsRu.Api.Models;
@@ -18,8 +19,9 @@ namespace Sports.SportsRu.Api.Services
     {
         private readonly HttpClient _httpClient;
         private readonly HttpClient _statHttpClient;
+        private readonly ILogger<SportsRuApiService> _logger;
 
-        public SportsRuApiService()
+        public SportsRuApiService(ILogger<SportsRuApiService> logger)
         {
             _httpClient = new HttpClient
             {
@@ -29,6 +31,7 @@ namespace Sports.SportsRu.Api.Services
             {
                 BaseAddress = new Uri("https://stat.sports.ru")
             };
+            _logger = logger;
         }
 
         public async Task<ServiceResponse<NewsResponseCollection>> GetNewsAsync(NewsType newsType, NewsPriority newsPriority, NewsContentOrigin newsContentOrigin, int count)
@@ -116,15 +119,24 @@ namespace Sports.SportsRu.Api.Services
 
         public async Task<ServiceResponse<HotContentResponse>> GetHotContent()
         {
-            var uri = new Uri("api/ru/hot_content/?metod_id=1", UriKind.Relative);
-            var response = await _statHttpClient.GetAsync(uri).ConfigureAwait(false);
-            string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            if(response.IsSuccessStatusCode)
+            HttpResponseMessage response = null;
+            try
             {
-                var hotContent = JsonSerializer.Deserialize<HotContentResponse>(content);
-                return ServiceResponseFactory.Success(hotContent);
+                var uri = new Uri("api/ru/hot_content/?metod_id=1", UriKind.Relative);
+                response = await _statHttpClient.GetAsync(uri).ConfigureAwait(false);
+                string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (response.IsSuccessStatusCode)
+                {
+                    var hotContent = JsonSerializer.Deserialize<HotContentResponse>(content);
+                    return ServiceResponseFactory.Success(hotContent);
+                }
+                return ServiceResponseFactory.Error<HotContentResponse>(content);
             }
-            return ServiceResponseFactory.Error<HotContentResponse>(content);
+            catch(Exception e)
+            {
+                _logger.LogError(e, $"Can't get HotContent, Response: {JsonSerializer.Serialize(response)}");
+                return ServiceResponseFactory.Error<HotContentResponse>("Unknown error");
+            }
         }
 
         #region IDisposable Support

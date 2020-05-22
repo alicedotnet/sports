@@ -25,10 +25,11 @@ namespace Sports.Tests.TestsInfrastructure.Fixtures
             builder.UseInMemoryDatabase("sports");
             SportsContext = new SportsContext(builder.Options);
 
-            ISportsRuApiService sportsRuApiService = new SportsRuApiService();
+            var sportsRuLogger = Mock.Of<ILogger<SportsRuApiService>>();
+            ISportsRuApiService sportsRuApiService = new SportsRuApiService(sportsRuLogger);
             NewsService = new NewsService(SportsContext);
-            var logger = Mock.Of<ILogger<SyncService>>();
-            SyncService = new SyncService(SportsContext, sportsRuApiService, NewsService, logger);
+            var syncServiceLogger = Mock.Of<ILogger<SyncService>>();
+            SyncService = new SyncService(SportsContext, sportsRuApiService, NewsService, syncServiceLogger);
             NewsArticleCommentService = new NewsArticleCommentService(SportsContext);
         }
     }

@@ -18,6 +18,7 @@ namespace Sports.Alice
         {
             var host = CreateHostBuilder(args)
                 .ConfigureServices(ConfigureContext)
+                .ConfigureServices(ConfigureAzure)
                 .Build();
             InitializeContext(host.Services);
             host.Run();
@@ -30,13 +31,27 @@ namespace Sports.Alice
                     webBuilder.UseStartup<Startup>();
                 })
                 .ConfigureLogging((ctx, logging) => {
-                    //workaround for serilog
-                    Environment.CurrentDirectory = ctx.HostingEnvironment.ContentRootPath;
                     var configuration = ctx.Configuration.GetSection("Logging");
                     logging.AddConfiguration(configuration);
-                    logging.AddFile(configuration);
+
+                    if(!IsOnAzure())
+                    {
+                        //workaround for serilog
+                        Environment.CurrentDirectory = ctx.HostingEnvironment.ContentRootPath;
+                        logging.AddFile(configuration);
+                    }
+
                     logging.AddConsole();
                 });
+
+        private static void ConfigureAzure(HostBuilderContext ctx, IServiceCollection services)
+        {
+            if(IsOnAzure())
+            {
+                services.AddApplicationInsightsTelemetry();
+            }
+        }
+
         private static void ConfigureContext(HostBuilderContext ctx, IServiceCollection services)
         {
             string connectionString = ctx.Configuration.GetConnectionString("database");
@@ -51,6 +66,11 @@ namespace Sports.Alice
             using var scope = services.CreateScope();
             var sportsContext = scope.ServiceProvider.GetService<SportsContext>();
             sportsContext.Database.Migrate();
+        }
+
+        private static bool IsOnAzure()
+        {
+            return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
         }
     }
 }

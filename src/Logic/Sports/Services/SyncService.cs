@@ -34,7 +34,7 @@ namespace Sports.Services
         public async Task SyncNewsAsync()
         {
             var newsResponse = await _sportsRuApiService.GetNewsAsync(NewsType.HomePage, NewsPriority.Main, NewsContentOrigin.Mixed, 100).ConfigureAwait(false);
-            var hotContent = await _sportsRuApiService.GetHotContent().ConfigureAwait(false);
+            var hotContent = await _sportsRuApiService.GetHotContentAsync().ConfigureAwait(false);
             IEnumerable<int> hotNews = null;
             if(hotContent.IsSuccess)
             {

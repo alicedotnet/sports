@@ -3,6 +3,7 @@ using Sports.Common.Factories;
 using Sports.Common.Models;
 using Sports.SportsRu.Api.Helpers;
 using Sports.SportsRu.Api.Models;
+using Sports.SportsRu.Api.Resources;
 using Sports.SportsRu.Api.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,20 +18,20 @@ namespace Sports.SportsRu.Api.Services
 {
     public class SportsRuApiService : ISportsRuApiService, IDisposable
     {
-        private readonly HttpClient _httpClient;
-        private readonly HttpClient _statHttpClient;
+        private readonly IHttpService _httpClient;
+        protected IHttpService StatHttpClient { get; set; }
         private readonly ILogger<SportsRuApiService> _logger;
 
         public SportsRuApiService(ILogger<SportsRuApiService> logger)
         {
-            _httpClient = new HttpClient
+            _httpClient = new HttpService(new HttpClient
             {
                 BaseAddress = new Uri("https://www.sports.ru")
-            };
-            _statHttpClient = new HttpClient()
+            });
+            StatHttpClient = new HttpService(new HttpClient()
             {
                 BaseAddress = new Uri("https://stat.sports.ru")
-            };
+            });
             _logger = logger;
         }
 
@@ -61,14 +62,7 @@ namespace Sports.SportsRu.Api.Services
             }
             string args = HttpHelper.UrlEncodeJson(newsRequest);
             var uri = new Uri($"core/news/list?args={args}", UriKind.Relative);
-            var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
-            string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
-            {                
-                var newsResponse = JsonSerializer.Deserialize<NewsResponseCollection>(content);
-                return ServiceResponseFactory.Success(newsResponse);
-            }
-            return ServiceResponseFactory.Error<NewsResponseCollection>(content);
+            return await GetResponseFromSportsAsync<NewsResponseCollection>(uri).ConfigureAwait(false);
         }
 
         public async Task<ServiceResponse<CommentIdsResponseCollection>> GetCommentsIdsAsync(int messageId, MessageClass messageClass, Sort sort, int commentsCount = 10)
@@ -92,50 +86,65 @@ namespace Sports.SportsRu.Api.Services
 
             string args = HttpHelper.UrlEncodeJson(commentsIdsRequest);
             var uri = new Uri($"core/api/comment/get_ids?args={args}", UriKind.Relative);
-            var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
-            string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
+            var response = await GetResponseFromSportsAsync<CommentIdsResponseCollection>(uri).ConfigureAwait(false);
+            if(response.Content != null)
             {
-                var commentIdsResponse = JsonSerializer.Deserialize<CommentIdsResponseCollection>(content);
-                var commentIdsResponseShort = new CommentIdsResponseCollection(commentIdsResponse.Take(commentsCount));
-                return ServiceResponseFactory.Success(commentIdsResponseShort);
+                response.Content = new CommentIdsResponseCollection(response.Content.Take(commentsCount));
             }
-            return ServiceResponseFactory.Error<CommentIdsResponseCollection>(content);
+
+            return response;
         }
 
         public async Task<ServiceResponse<CommentByIdsResponse>> GetCommentsByIds(IEnumerable<int> ids)
         {
             string commentsIds = string.Join(",", ids);
             var uri = new Uri($"api/comment/get/by_ids.json?comment_ids={commentsIds}&style=newjs", UriKind.Relative);
-            var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
-            string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
-            {
-                var commentsByIdsResponse = JsonSerializer.Deserialize<CommentByIdsResponse>(content);
-                return ServiceResponseFactory.Success(commentsByIdsResponse);
-            }
-            return ServiceResponseFactory.Error<CommentByIdsResponse>(content);
+            return await GetResponseFromSportsAsync<CommentByIdsResponse>(uri).ConfigureAwait(false);
         }
 
-        public async Task<ServiceResponse<HotContentResponse>> GetHotContent()
+        public async Task<ServiceResponse<HotContentResponse>> GetHotContentAsync()
+        {
+            var uri = new Uri("api/ru/hot_content/?metod_id=1", UriKind.Relative);
+            return await GetResponseFromStatAsync<HotContentResponse>(uri).ConfigureAwait(false);
+        }
+
+        private async Task<ServiceResponse<T>> GetResponseFromSportsAsync<T>(Uri requestUri)
+        {
+            return await GetResponseAsync<T>(requestUri, _httpClient).ConfigureAwait(false);
+        }
+
+        private async Task<ServiceResponse<T>> GetResponseFromStatAsync<T>(Uri requestUri)
+        {
+            return await GetResponseAsync<T>(requestUri, StatHttpClient).ConfigureAwait(false);
+        }
+
+        private async Task<ServiceResponse<T>> GetResponseAsync<T>(Uri requestUri, IHttpService httpService)
         {
             HttpResponseMessage response = null;
             try
             {
-                var uri = new Uri("api/ru/hot_content/?metod_id=1", UriKind.Relative);
-                response = await _statHttpClient.GetAsync(uri).ConfigureAwait(false);
-                string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                response = await httpService.GetAsync(requestUri).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
-                    var hotContent = JsonSerializer.Deserialize<HotContentResponse>(content);
+                    string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    var hotContent = JsonSerializer.Deserialize<T>(content);
                     return ServiceResponseFactory.Success(hotContent);
                 }
-                return ServiceResponseFactory.Error<HotContentResponse>(content);
+                string errorMessage;
+                if(response.StatusCode == HttpStatusCode.BadGateway)
+                {
+                    errorMessage = response.ReasonPhrase;
+                }
+                else
+                {
+                    errorMessage = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                return ServiceResponseFactory.Error<T>(errorMessage);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                _logger.LogError(e, $"Can't get HotContent, Response: {JsonSerializer.Serialize(response)}");
-                return ServiceResponseFactory.Error<HotContentResponse>("Unknown error");
+                _logger.LogError(e, $"Response data: {JsonSerializer.Serialize(response)}");
+                return ServiceResponseFactory.Error<T>(SportsRuApiResources.Error_Unknown);
             }
         }
 
@@ -149,7 +158,7 @@ namespace Sports.SportsRu.Api.Services
                 if (disposing)
                 {
                     _httpClient.Dispose();
-                    _statHttpClient.Dispose();
+                    StatHttpClient.Dispose();
                 }
 
                 _disposedValue = true;

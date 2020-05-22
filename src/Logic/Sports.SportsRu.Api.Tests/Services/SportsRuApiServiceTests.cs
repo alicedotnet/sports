@@ -1,9 +1,15 @@
-﻿using Sports.Common.Tests;
+﻿using Microsoft.Extensions.Logging;
+using Moq;
+using Sports.Common.Tests;
 using Sports.SportsRu.Api.Models;
+using Sports.SportsRu.Api.Services;
 using Sports.SportsRu.Api.Services.Interfaces;
 using Sports.SportsRu.Api.Tests.TestsInfrastructure;
 using Sports.SportsRu.Api.Tests.TestsInfrastructure.Fixtures;
-using System.Linq;
+using Sports.SportsRu.Api.Tests.TestsInfrastructure.Mocks;
+using System;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -82,11 +88,26 @@ namespace Sports.SportsRu.Api.Tests.Services
         [Fact]
         public async Task GetHotContent()
         {
-            var hotContentResponse = await _sportsRuApiService.GetHotContent().ConfigureAwait(false);
+            var hotContentResponse = await _sportsRuApiService.GetHotContentAsync().ConfigureAwait(false);
             Assert.True(hotContentResponse.IsSuccess);
             Assert.NotNull(hotContentResponse.Content.News);
             Assert.NotEmpty(hotContentResponse.Content.News);
             WritePrettyJson(hotContentResponse.Content);
+        }
+
+        [Fact]
+        public async Task GetHotContent_ErrorResponse()
+        {
+            using var responseMock = new HttpResponseMessage(HttpStatusCode.BadGateway)
+            {
+                ReasonPhrase = "Bad Gateway"
+            };
+            var statHttpClientMock = new Mock<IHttpService>();
+            statHttpClientMock.Setup(x => x.GetAsync(It.IsAny<Uri>())).ReturnsAsync(responseMock);
+            using var sportsRuApiService = new SportsRuApiServiceMock(statHttpClientMock.Object, Mock.Of<ILogger<SportsRuApiService>>());
+            var hotContentResponse = await sportsRuApiService.GetHotContentAsync().ConfigureAwait(false);
+            Assert.False(hotContentResponse.IsSuccess);
+            Assert.Equal(responseMock.ReasonPhrase, hotContentResponse.ErrorMessage);
         }
     }
 }

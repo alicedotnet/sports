@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
-namespace Sports.Common.Tests.Extensions
+namespace Sports.Common.Tests.Helpers
 {
     static class JsonSerializerHelper
     {

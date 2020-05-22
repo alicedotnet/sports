@@ -6,7 +6,7 @@ namespace Sports.Common.Models
 {
     public class ServiceResponse<T> : ServiceResponse
     {
-        public T Content { get; }
+        public T Content { get; set; }
 
         internal ServiceResponse(T content, bool
             success = true, string errorMessage = null)

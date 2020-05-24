@@ -35,16 +35,16 @@ namespace Sports.Services
         {
             var newsResponse = await _sportsRuApiService.GetNewsAsync(NewsType.HomePage, NewsPriority.Main, NewsContentOrigin.Mixed, 100).ConfigureAwait(false);
             var hotContent = await _sportsRuApiService.GetHotContentAsync().ConfigureAwait(false);
-            IEnumerable<int> hotNews = null;
+            IEnumerable<int> hotNewsIds = null;
             if(hotContent.IsSuccess)
             {
-                hotNews = hotContent.Content.News;
+                hotNewsIds = hotContent.Content.News;
             }
             if(newsResponse.IsSuccess)
             {
                 foreach (var newsArticle in newsResponse.Content)
                 {
-                    if(newsArticle.BodyIsEmpty ||
+                    if (newsArticle.BodyIsEmpty ||
                         newsArticle.ContentOption?.Name == "special" ||
                         !SportsRuHelper.IsInternalUrl(newsArticle.DesktopUrl)) //usually this is not a news article but some promotion
                     {
@@ -54,23 +54,16 @@ namespace Sports.Services
                     var existingArticle = _sportsContext.NewsArticles.FirstOrDefault(x => x.ExternalId == idString);
                     if (existingArticle == null)
                     {
-                        _sportsContext.NewsArticles.Add(new NewsArticle()
+                        var newArticle = new NewsArticle()
                         {
-                            ExternalId = idString,
-                            Title = newsArticle.Title,
-                            Url = newsArticle.DesktopUrl,
-                            IsHotContent = IsHotContent(newsArticle.Id, hotNews),
-                            CommentsCount = newsArticle.CommentsCount,
-                            PublishedDate = DateTimeOffset
-                                .FromUnixTimeSeconds(newsArticle.Published.Timestamp)
-                                .UtcDateTime
-                        });
+                            ExternalId = idString
+                        };
+                        Map(newsArticle, newArticle, hotNewsIds);
+                        _sportsContext.NewsArticles.Add(newArticle);
                     }
                     else
                     {
-                        existingArticle.IsHotContent = IsHotContent(newsArticle.Id, hotNews);
-                        existingArticle.CommentsCount = newsArticle.CommentsCount;
-
+                        Map(newsArticle, existingArticle, hotNewsIds);
                         _sportsContext.NewsArticles.Update(existingArticle);
                     }
                 }
@@ -96,19 +89,17 @@ namespace Sports.Services
                                 var existingComment = _sportsContext.NewsArticlesComments.FirstOrDefault(x => x.ExternalId == comment.Id.ToString(CultureInfo.InvariantCulture));
                                 if(existingComment == null)
                                 {
-                                    _sportsContext.NewsArticlesComments.Add(new NewsArticleComment()
+                                    var newComment = new NewsArticleComment()
                                     {
                                         NewsArticleId = newsArticle.Id,
                                         ExternalId = comment.Id.ToString(CultureInfo.InvariantCulture),
-                                        Text = NormalizeText(comment.Text),
-                                        Rating = comment.Rating.Plus + comment.Rating.Minus
-                                    });
+                                    };
+                                    Map(comment, newComment);
+                                    _sportsContext.NewsArticlesComments.Add(newComment);
                                 }
                                 else
                                 {
-                                    existingComment.Rating = comment.Rating.Plus + comment.Rating.Minus;
-                                    existingComment.Text = NormalizeText(comment.Text);
-
+                                    Map(comment, existingComment);
                                     _sportsContext.NewsArticlesComments.Update(existingComment);
                                 }
                             }
@@ -123,16 +114,6 @@ namespace Sports.Services
             _sportsContext.SaveChanges();
         }
 
-        private string NormalizeText(string value)
-        {
-            return value.Replace("<br />", "\n", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private bool IsHotContent(int newsArticleId, IEnumerable<int> hotNews)
-        {
-            return hotNews != null && hotNews.Contains(newsArticleId);
-        }
-
         public void DeleteOldData(DateTimeOffset oldestDateToKeep)
         {
             var date = oldestDateToKeep.UtcDateTime;
@@ -141,6 +122,23 @@ namespace Sports.Services
             _sportsContext.NewsArticles.RemoveRange(oldArticles);
 
             _sportsContext.SaveChanges();
+        }
+
+        private void Map(CommentInfo from, NewsArticleComment to)
+        {
+            to.Rating = from.Rating.Plus + from.Rating.Minus;
+            to.Text = from.Text.Replace("<br />", "\n", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void Map(NewsArticleInfo from, NewsArticle to, IEnumerable<int> hotNewsIds)
+        {
+            to.Title = from.Title;
+            to.Url = from.DesktopUrl;
+            to.IsHotContent = hotNewsIds != null && hotNewsIds.Contains(from.Id);
+            to.CommentsCount = from.CommentsCount;
+            to.PublishedDate = DateTimeOffset
+                        .FromUnixTimeSeconds(from.Published.Timestamp)
+                        .UtcDateTime;
         }
     }
 }

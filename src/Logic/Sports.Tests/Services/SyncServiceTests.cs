@@ -34,6 +34,7 @@ namespace Sports.Tests.Services
         [Fact]
         public async Task SyncNews()
         {
+            Assert.Empty(_sportsContext.NewsArticles);
             await _syncService.SyncNewsAsync().ConfigureAwait(false);
             Assert.True(_sportsContext.NewsArticles.Any());
             var article = _sportsContext.NewsArticles.First();

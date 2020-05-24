@@ -124,13 +124,13 @@ namespace Sports.Services
             _sportsContext.SaveChanges();
         }
 
-        private void Map(CommentInfo from, NewsArticleComment to)
+        private static void Map(CommentInfo from, NewsArticleComment to)
         {
             to.Rating = from.Rating.Plus + from.Rating.Minus;
             to.Text = from.Text.Replace("<br />", "\n", StringComparison.OrdinalIgnoreCase);
         }
 
-        private void Map(NewsArticleInfo from, NewsArticle to, IEnumerable<int> hotNewsIds)
+        private static void Map(NewsArticleInfo from, NewsArticle to, IEnumerable<int> hotNewsIds)
         {
             to.Title = from.Title;
             to.Url = from.DesktopUrl;

@@ -4,6 +4,7 @@ using Sports.Data.Entities;
 using Sports.Services.Interfaces;
 using Sports.Tests.TestsInfrastructure;
 using Sports.Tests.TestsInfrastructure.Fixtures;
+using Sports.Tests.TestsInfrastructure.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,8 @@ namespace Sports.Tests.Services
             var article = _sportsContext.NewsArticles.First();
             Assert.NotNull(article.ExternalId);
             Assert.NotNull(article.PublishedDate);
+
+            SportsContextHelper.DeleteAllNews(_sportsContext);
         }
 
         [Fact]
@@ -49,6 +52,8 @@ namespace Sports.Tests.Services
             await _syncService.SyncNewsAsync().ConfigureAwait(false);
             await _syncService.SyncPopularNewsCommentsAsync(DateTimeOffset.Now.AddDays(-1), 1).ConfigureAwait(false);
             Assert.NotEmpty(_sportsContext.NewsArticlesComments);
+
+            SportsContextHelper.DeleteAllNews(_sportsContext);
         }
 
         [Fact]
@@ -60,6 +65,8 @@ namespace Sports.Tests.Services
             var comments = _newsArticleCommentService.GetBestComments(popularNewsArticle.Id, 5);
             Assert.NotEmpty(comments);
             WritePrettyJson(comments);
+
+            SportsContextHelper.DeleteAllNews(_sportsContext);
         }
 
         [Fact]

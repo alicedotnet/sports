@@ -244,7 +244,7 @@ namespace Sports.Alice.Services
             return new AliceResponse(aliceRequest, Sports_Resources.BestComments_NoComments, noResponseButtons);
         }
 
-        private AliceResponseBase GetHelp(AliceRequest aliceRequest)
+        private static AliceResponseBase GetHelp(AliceRequest aliceRequest)
         {
             var buttons = new List<AliceButtonModel>()
                 {

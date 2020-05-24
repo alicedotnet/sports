@@ -44,7 +44,7 @@ namespace Sports.Alice.Tests.TestsInfrastructure.Fixtures
             services.AddDbContext<SportsContext>(builder => builder.UseInMemoryDatabase("sports"));
         }
 
-        private void InitializeDatabase(IServiceProvider services)
+        private static void InitializeDatabase(IServiceProvider services)
         {
             using var scope = services.CreateScope();
             var context = scope.ServiceProvider.GetService<SportsContext>();

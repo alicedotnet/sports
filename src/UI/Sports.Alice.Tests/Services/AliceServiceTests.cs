@@ -38,9 +38,9 @@ namespace Sports.Alice.Tests.Services
             AliceRequest aliceRequest = new AliceRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel()
+                Request = new AliceRequestModel<object>()
                 {
-                    Nlu = new AliceNLUModel()
+                    Nlu = new AliceNLUModel<object>()
                     {
                         Tokens = new string[] {"новости"}
                     }
@@ -61,9 +61,9 @@ namespace Sports.Alice.Tests.Services
             AliceRequest aliceRequest = new AliceRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel()
+                Request = new AliceRequestModel<object>()
                 {
-                    Nlu = new AliceNLUModel()
+                    Nlu = new AliceNLUModel<object>()
                     {
                         Tokens = new string[] { "главные", "новости" }
                     }
@@ -84,9 +84,9 @@ namespace Sports.Alice.Tests.Services
             AliceRequest aliceRequest = new AliceRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel()
+                Request = new AliceRequestModel<object>()
                 {
-                    Nlu = new AliceNLUModel()
+                    Nlu = new AliceNLUModel<object>()
                     {
                         Tokens = new string[] { "лучшие", "комментарии" }
                     }

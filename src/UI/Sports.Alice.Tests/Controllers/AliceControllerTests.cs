@@ -42,7 +42,7 @@ namespace Sports.Alice.Tests.Controllers
             var aliceRequest = new AliceRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel()
+                Request = new AliceRequestModel<object>()
                 {
                     Type = AliceRequestType.ButtonPressed,
                     Payload = new AliceCommand(AliceCommandType.BestComments)
@@ -62,7 +62,7 @@ namespace Sports.Alice.Tests.Controllers
             var aliceRequest = new AliceRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel()
+                Request = new AliceRequestModel<object>()
                 {
                     Type = AliceRequestType.ButtonPressed,
                     Payload = new AliceCommand(AliceCommandType.LatestNews)

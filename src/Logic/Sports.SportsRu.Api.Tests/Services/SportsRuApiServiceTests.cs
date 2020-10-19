@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
+using Moq.Protected;
 using Sports.Common.Tests;
 using Sports.SportsRu.Api.Models;
 using Sports.SportsRu.Api.Services;
@@ -10,6 +11,7 @@ using Sports.SportsRu.Api.Tests.TestsInfrastructure.Mocks;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -102,9 +104,25 @@ namespace Sports.SportsRu.Api.Tests.Services
             {
                 ReasonPhrase = "Bad Gateway"
             };
-            var statHttpClientMock = new Mock<IHttpService>();
-            statHttpClientMock.Setup(x => x.GetAsync(It.IsAny<Uri>())).ReturnsAsync(responseMock);
-            using var sportsRuApiService = new SportsRuApiServiceMock(statHttpClientMock.Object, Mock.Of<ILogger<SportsRuApiService>>());
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                  "SendAsync",
+                  ItExpr.IsAny<HttpRequestMessage>(),
+                  ItExpr.IsAny<CancellationToken>()
+               )
+               .ReturnsAsync(responseMock)
+               .Verifiable();
+            handlerMock
+                .Protected()
+                .Setup("Dispose", ItExpr.IsAny<bool>());
+
+            var statHttpClientMock = new HttpClient(handlerMock.Object)
+            {
+                BaseAddress = new Uri("https://anyvalid.url")
+            };
+            using var sportsRuApiService = new SportsRuApiServiceMock(statHttpClientMock, Mock.Of<ILogger<SportsRuApiService>>());
             var hotContentResponse = await sportsRuApiService.GetHotContentAsync().ConfigureAwait(false);
             Assert.False(hotContentResponse.IsSuccess);
             Assert.Equal(responseMock.ReasonPhrase, hotContentResponse.ErrorMessage);

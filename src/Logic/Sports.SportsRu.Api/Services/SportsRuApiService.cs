@@ -18,20 +18,20 @@ namespace Sports.SportsRu.Api.Services
 {
     public class SportsRuApiService : ISportsRuApiService, IDisposable
     {
-        private readonly IHttpService _httpClient;
-        protected IHttpService StatHttpClient { get; set; }
+        private readonly HttpClient _httpClient;
+        protected HttpClient StatHttpClient { get; set; }
         private readonly ILogger<SportsRuApiService> _logger;
 
         public SportsRuApiService(ILogger<SportsRuApiService> logger)
         {
-            _httpClient = new HttpService(new HttpClient
+            _httpClient = new HttpClient
             {
                 BaseAddress = new Uri("https://www.sports.ru")
-            });
-            StatHttpClient = new HttpService(new HttpClient()
+            };
+            StatHttpClient = new HttpClient()
             {
                 BaseAddress = new Uri("https://stat.sports.ru")
-            });
+            };
             _logger = logger;
         }
 
@@ -118,12 +118,12 @@ namespace Sports.SportsRu.Api.Services
             return await GetResponseAsync<T>(requestUri, StatHttpClient).ConfigureAwait(false);
         }
 
-        private async Task<ServiceResponse<T>> GetResponseAsync<T>(Uri requestUri, IHttpService httpService)
+        private async Task<ServiceResponse<T>> GetResponseAsync<T>(Uri requestUri, HttpClient httpClient)
         {
             HttpResponseMessage response = null;
             try
             {
-                response = await httpService.GetAsync(requestUri).ConfigureAwait(false);
+                response = await httpClient.GetAsync(requestUri).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

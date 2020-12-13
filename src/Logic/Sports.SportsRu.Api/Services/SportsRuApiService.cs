@@ -135,6 +135,10 @@ namespace Sports.SportsRu.Api.Services
                 {
                     errorMessage = response.ReasonPhrase;
                 }
+                else if(response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    errorMessage = response.ReasonPhrase;
+                }
                 else
                 {
                     errorMessage = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

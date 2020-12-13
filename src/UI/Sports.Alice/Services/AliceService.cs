@@ -99,7 +99,7 @@ namespace Sports.Alice.Services
             {
                 var titles = news.Select(x => x.Title);
                 string text = $"{Sports_Resources.LatestNews_Header_Tts}\n\n{string.Join("\n\n", titles)}";
-                string tts = $"{Sports_Resources.LatestNews_Header_Tts}{AliceTtsHelper.SilenceString500}{string.Join(AliceTtsHelper.SilenceString500, titles)}{AliceTtsHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
+                string tts = $"{Sports_Resources.LatestNews_Header_Tts}{AliceHelper.SilenceString500}{string.Join(AliceHelper.SilenceString500, titles)}{AliceHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
                 var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
                 response.Response.Card = new AliceGalleryCardModel
                 {
@@ -138,7 +138,7 @@ namespace Sports.Alice.Services
             {
                 var titles = news.Select(x => x.Title);
                 string text = $"{Sports_Resources.MainNews_Header_Tts}\n\n{string.Join("\n\n", titles)}";
-                string tts = $"{Sports_Resources.MainNews_Header_Tts}{AliceTtsHelper.SilenceString500}{string.Join(AliceTtsHelper.SilenceString500, titles)}{AliceTtsHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
+                string tts = $"{Sports_Resources.MainNews_Header_Tts}{AliceHelper.SilenceString500}{string.Join(AliceHelper.SilenceString500, titles)}{AliceHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
                 var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
                 response.Response.Card = new AliceGalleryCardModel
                 {
@@ -198,7 +198,7 @@ namespace Sports.Alice.Services
                     CustomSessionState sessionState = null;
                     if (nextNewsArticle != null)
                     {
-                        ttsEnding = $"{AliceTtsHelper.SilenceString500}{Sports_Resources.Tips_BestComments_Next}";
+                        ttsEnding = $"{AliceHelper.SilenceString500}{Sports_Resources.Tips_BestComments_Next}";
                         buttons.Add(new AliceButtonModel()
                         {
                             Title = Sports_Resources.Command_BestComments_Next,
@@ -215,11 +215,11 @@ namespace Sports.Alice.Services
                     buttons.Add(new AliceButtonModel(Sports_Resources.Command_MainNews, true, new AliceCommand(AliceCommandType.MainNews), null));
 
                     var text = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
-                    var tts = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title}\"{AliceTtsHelper.SilenceString500}");
+                    var tts = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title}\"{AliceHelper.SilenceString500}");
                     foreach (var comment in comments)
                     {
                         string textComment = $"\n\n{EmojiLibrary.SpeechBalloon} {comment.CommentText} {EmojiLibrary.ThumbsUp}{comment.CommentRating}";
-                        string textTts = $"{AliceTtsHelper.SilenceString500}{comment.CommentText}";
+                        string textTts = $"{AliceHelper.SilenceString500}{comment.CommentText}";
                         if (text.Length + textComment.Length <= AliceResponseModel.TextMaxLenght
                             && tts.Length + textTts.Length + ttsEnding.Length <= AliceResponseModel.TtsMaxLenght)
                         {

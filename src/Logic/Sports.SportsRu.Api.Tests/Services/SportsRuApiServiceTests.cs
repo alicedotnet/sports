@@ -87,11 +87,11 @@ namespace Sports.SportsRu.Api.Tests.Services
             WritePrettyJson(commentsByIdsResponse.Content);
         }
 
-        [Fact]
+        //[Fact]
         public async Task GetHotContent()
         {
             var hotContentResponse = await _sportsRuApiService.GetHotContentAsync().ConfigureAwait(false);
-            Assert.True(hotContentResponse.IsSuccess);
+            Assert.True(hotContentResponse.IsSuccess, hotContentResponse.ErrorMessage);
             Assert.NotNull(hotContentResponse.Content.News);
             Assert.NotEmpty(hotContentResponse.Content.News);
             WritePrettyJson(hotContentResponse.Content);

@@ -4,6 +4,7 @@ using Sports.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sports.Alice.Workers
@@ -18,6 +19,12 @@ namespace Sports.Alice.Workers
             TimerInterval = TimeSpan.FromMinutes(10);
         }
 
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            SyncNewsAsync().Wait(stoppingToken);
+            return base.ExecuteAsync(stoppingToken);
+        }
+
         protected override async void DoWork(object state)
         {
             using var scope = ServiceProvider.CreateScope();
@@ -30,6 +37,21 @@ namespace Sports.Alice.Workers
             catch(Exception e)
             {
                 var logger = scope.ServiceProvider.GetService<ILogger<SyncNewsCommentsWorker>>();
+                logger.LogError(e, string.Empty);
+            }
+        }
+
+        protected async Task SyncNewsAsync()
+        {
+            using var scope = ServiceProvider.CreateScope();
+            try
+            {
+                var syncService = scope.ServiceProvider.GetRequiredService<ISyncService>();
+                await syncService.SyncNewsAsync().ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<SyncNewsCommentsWorker>>();
                 logger.LogError(e, string.Empty);
             }
         }

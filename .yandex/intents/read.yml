@@ -31,9 +31,10 @@ $latest:
     %lemma
     последний
 $news:
+    %lemma
     новости
 filler:
     %lemma
     $Filler
     прочитай
-    
+    рассказать

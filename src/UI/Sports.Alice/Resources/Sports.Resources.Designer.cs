@@ -124,7 +124,7 @@ namespace Sports.Alice.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Вы можете попросить меня прочитать последние новости спорта сказав фразу: последние новости, главные новости с помощью фразы: главные новости или лучшие комментарии с помощью фразы: лучшие комментарии.
+        ///   Looks up a localized string similar to Вы можете попросить меня прочитать последние или главные новости спорта, а также лучшие комментарии под главными новостями.
         /// </summary>
         internal static string Help_Text_Tts {
             get {

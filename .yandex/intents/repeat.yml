@@ -1,0 +1,6 @@
+root:
+    [$Repeat $What]
+$Repeat:
+    повтори
+$What:
+    .+

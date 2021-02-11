@@ -68,7 +68,7 @@ namespace Sports.Alice.Scenes
                         {
                             Title = Sports_Resources.Command_BestComments_OpenNewsArticle,
                             Url = newsArticle.Url,
-                            Hide = true
+                            Hide = false
                         }
                     };
                     string ttsEnding = string.Empty;

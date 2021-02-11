@@ -21,19 +21,34 @@ namespace Sports.Alice.Models
         public AliceIntentModel Next { get; set; }
 
         [JsonPropertyName(AliceConstants.AliceIntents.Help)]
-        public AliceIntentModel Help { get; set; }
+        public AliceIntentModel YandexHelp { get; set; }
 
         [JsonPropertyName(AliceConstants.AliceIntents.WhatCanYouDo)]
-        public AliceIntentModel WhatCanYouDo { get; set; }
+        public AliceIntentModel YandexWhatCanYouDo { get; set; }
 
         [JsonIgnore]
         public bool IsHelp
         {
             get
             {
-                return Help != null || WhatCanYouDo != null;
+                return YandexHelp != null || YandexWhatCanYouDo != null;
             }
         }
+
+        [JsonPropertyName(AliceConstants.AliceIntents.Repeat)]
+        public AliceIntentModel YandexRepeat { get; set; }
+
+        [JsonPropertyName("repeat")]
+        public AliceIntentModel Repeat { get; set; }
+
+        public bool IsRepeat
+        {
+            get
+            {
+                return YandexRepeat != null || Repeat != null;
+            }
+        }
+
     }
 
     public class NewsSlots

@@ -50,7 +50,7 @@ namespace Sports.Tests.Services
         {
             Assert.Empty(_sportsContext.NewsArticlesComments);
             await _syncService.SyncNewsAsync().ConfigureAwait(false);
-            await _syncService.SyncPopularNewsCommentsAsync(DateTimeOffset.Now.AddDays(-1), 1).ConfigureAwait(false);
+            await _syncService.SyncPopularNewsCommentsAsync(DateTimeOffset.Now.AddDays(-1), 10).ConfigureAwait(false);
             Assert.NotEmpty(_sportsContext.NewsArticlesComments);
 
             SportsContextHelper.DeleteAllNews(_sportsContext);

@@ -1,5 +1,6 @@
 root:
     [($main)* ($news)*]
+    [($latest)* ($news)*]
 slots:
     main:
         source: $main
@@ -11,7 +12,7 @@ $main:
     популярный
 $latest:
     %lemma
-    последний      
+    последний
 $news:
     новости
 filler:

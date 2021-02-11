@@ -69,6 +69,10 @@ namespace Sports.Alice.Services
             else
             {
                 currentScene = _scenesProvider.GetScene(sportsRequest.State.Session.CurrentScene);
+                if(sportsRequest.Request.Nlu.Intents.IsRepeat)
+                {
+                    return currentScene.Repeat(sportsRequest);
+                }
                 var nextScene = currentScene.MoveToNextScene(sportsRequest);
                 if(nextScene != null)
                 {

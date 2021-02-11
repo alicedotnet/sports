@@ -1,0 +1,39 @@
+root:
+    $mainNews
+    $latestNews
+    $bestComments
+slots:
+    mainNews:
+        source: $mainNews
+    latestNews:
+        source: $latestNews
+    bestComments:
+        source: $bestComments
+
+$bestComments:
+    [($best)* ($comments)]
+$best:
+    %lemma
+    лучший
+$comments:
+    %lemma
+    комментарий
+    коммент
+$latestNews:
+    [($latest)* ($news)*]
+$mainNews:
+    [($main)* ($news)*]
+$main:
+    %lemma
+    главный
+    популярный
+$latest:
+    %lemma
+    последний
+$news:
+    новости
+filler:
+    %lemma
+    $Filler
+    прочитай
+    

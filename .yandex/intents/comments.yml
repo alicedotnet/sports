@@ -1,8 +1,0 @@
-root:
-    %lemma
-    комментарий
-    коммент
-filler:
-    %lemma
-    $Filler
-    лучший

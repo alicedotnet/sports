@@ -45,11 +45,11 @@ namespace Sports.Alice.Tests.Services
                     {
                         Intents = new SportsIntents()
                         {
-                            News = new AliceIntentModel<NewsSlots>()
+                            Read = new AliceIntentModel<ReadSlots>()
                             {
-                                Slots = new NewsSlots()
+                                Slots = new ReadSlots()
                                 {
-                                    Latest = new AliceEntityStringModel()
+                                    LatestNews = new AliceEntityStringModel()
                                 }
                             }
                         }
@@ -82,11 +82,11 @@ namespace Sports.Alice.Tests.Services
                     {
                         Intents = new SportsIntents()
                         {
-                            News = new AliceIntentModel<NewsSlots>()
+                            Read = new AliceIntentModel<ReadSlots>()
                             {
-                                Slots = new NewsSlots()
+                                Slots = new ReadSlots()
                                 {
-                                    Main = new AliceEntityStringModel()
+                                    MainNews = new AliceEntityStringModel()
                                 }
                             }
                         }
@@ -119,7 +119,13 @@ namespace Sports.Alice.Tests.Services
                     {
                         Intents = new SportsIntents()
                         {
-                            Comments = new AliceIntentModel()
+                            Read = new AliceIntentModel<ReadSlots>()
+                            {
+                                Slots = new ReadSlots()
+                                {
+                                    BestComments = new AliceEntityStringModel()
+                                }
+                            }
                         }
                     }
                 },

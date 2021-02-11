@@ -50,7 +50,13 @@ namespace Sports.Alice.Tests.Controllers
                     {
                         Intents = new SportsIntents()
                         {
-                            Comments = new AliceIntentModel()
+                            Read = new AliceIntentModel<ReadSlots>()
+                            {
+                                Slots = new ReadSlots()
+                                {
+                                    BestComments = new AliceEntityStringModel()
+                                }
+                            }
                         }
                     }
                 },
@@ -68,7 +74,7 @@ namespace Sports.Alice.Tests.Controllers
         }
 
         [Fact]
-        public async Task TestLatestNewsPayload()
+        public async Task TestLatestNews()
         {
             var aliceRequest = new SportsRequest()
             {
@@ -79,11 +85,11 @@ namespace Sports.Alice.Tests.Controllers
                     {
                         Intents = new SportsIntents()
                         {
-                            News = new AliceIntentModel<NewsSlots>()
+                            Read = new AliceIntentModel<ReadSlots>()
                             {
-                                Slots = new NewsSlots()
+                                Slots = new ReadSlots()
                                 {
-                                    Latest = new AliceEntityStringModel()
+                                    LatestNews = new AliceEntityStringModel()
                                 }
                             }
                         }

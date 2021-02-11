@@ -11,11 +11,8 @@ namespace Sports.Alice.Models
 {
     public class SportsIntents
     {
-        [JsonPropertyName("news")]
-        public AliceIntentModel<NewsSlots> News { get; set; }
-
-        [JsonPropertyName("comments")]
-        public AliceIntentModel Comments { get; set; }
+        [JsonPropertyName("read")]
+        public AliceIntentModel<ReadSlots> Read { get; set; }
 
         [JsonPropertyName("next")]
         public AliceIntentModel Next { get; set; }
@@ -51,12 +48,15 @@ namespace Sports.Alice.Models
 
     }
 
-    public class NewsSlots
+    public class ReadSlots
     {
-        [JsonPropertyName("main")]
-        public AliceEntityStringModel Main { get; set; }
+        [JsonPropertyName("mainNews")]
+        public AliceEntityStringModel MainNews { get; set; }
 
-        [JsonPropertyName("latest")]
-        public AliceEntityStringModel Latest { get; set; }
+        [JsonPropertyName("latestNews")]
+        public AliceEntityStringModel LatestNews { get; set; }
+
+        [JsonPropertyName("bestComments")]
+        public AliceEntityStringModel BestComments { get; set; }
     }
 }

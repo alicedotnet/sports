@@ -39,9 +39,13 @@ namespace Sports.Alice.Services
                 sportsRequest.State.Session = new SportsSessionState();
             }
 
-            if(sportsRequest.Request.Nlu.Intents.News != null)
+            if(sportsRequest.Request.Nlu.Intents.Read != null)
             {
-                if (sportsRequest.Request.Nlu.Intents.News.Slots.Main != null)
+                if (sportsRequest.Request.Nlu.Intents.Read.Slots.BestComments != null)
+                {
+                    currentSceneType = SceneType.BestComments;
+                }
+                else if (sportsRequest.Request.Nlu.Intents.Read.Slots.MainNews != null)
                 {
                     currentSceneType = SceneType.MainNews;
                 }
@@ -49,10 +53,6 @@ namespace Sports.Alice.Services
                 {
                     currentSceneType = SceneType.LatestNews;
                 }
-            }
-            else if (sportsRequest.Request.Nlu.Intents.Comments != null)
-            {
-                currentSceneType = SceneType.BestComments;
             }
             else if(sportsRequest.Request.Nlu.Intents.IsHelp)
             {
@@ -80,7 +80,7 @@ namespace Sports.Alice.Services
                 }
             }
 
-            _fallbackLogger.LogInformation($"FALLBACK. Request: {0}", JsonSerializer.Serialize(sportsRequest));
+            _fallbackLogger.LogInformation("FALLBACK. Request: {0}", JsonSerializer.Serialize(sportsRequest));
             return currentScene.Fallback(sportsRequest);
         }
     }

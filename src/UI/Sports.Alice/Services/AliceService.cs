@@ -4,7 +4,9 @@ using Sports.Alice.Scenes;
 using Sports.Alice.Services.Interfaces;
 using System;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using Yandex.Alice.Sdk.Models;
 
 namespace Sports.Alice.Services
@@ -80,7 +82,12 @@ namespace Sports.Alice.Services
                 }
             }
 
-            _fallbackLogger.LogInformation("FALLBACK. Request: {0}", JsonSerializer.Serialize(sportsRequest));
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+            };
+            var requestText = JsonSerializer.Serialize(sportsRequest, options);
+            _fallbackLogger.LogInformation("FALLBACK. Request: {0}", requestText);
             return currentScene.Fallback(sportsRequest);
         }
     }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Sports.Alice.Models;
 using Sports.Alice.Models.Settings;
+using Sports.Alice.Scenes;
 using Sports.Alice.Services;
 using Sports.Alice.Services.Interfaces;
 using Sports.Alice.Tests.TestsInfrastructure;
@@ -132,6 +133,39 @@ namespace Sports.Alice.Tests.Services
                 State = new AliceStateModel<SportsSessionState, object>()
                 {
                     Session = new SportsSessionState()
+                }
+            };
+            using var scope = _services.CreateScope();
+            var aliceService = scope.ServiceProvider.GetService<IAliceService>();
+            var aliceResponse = aliceService.ProcessRequest(aliceRequest);
+            Assert.IsType<SportsResponse>(aliceResponse);
+            var aliceGalleryResponse = aliceResponse as SportsResponse;
+            Assert.NotNull(aliceGalleryResponse);
+            TestOutputHelper.WriteLine($"Response text: {aliceGalleryResponse.Response.Text}");
+        }
+
+        [Fact]
+        public void Fallback()
+        {
+            var aliceRequest = new SportsRequest()
+            {
+                Session = new AliceSessionModel(),
+                Request = new AliceRequestModel<SportsIntents>()
+                {
+                    Nlu = new AliceNLUModel<SportsIntents>()
+                    {
+                        Intents = new SportsIntents()
+                        {
+                        },
+                    },
+                    OriginalUtterance = "тест"
+                },
+                State = new AliceStateModel<SportsSessionState, object>()
+                {
+                    Session = new SportsSessionState()
+                    {
+                        CurrentScene = SceneType.MainNews
+                    }
                 }
             };
             using var scope = _services.CreateScope();

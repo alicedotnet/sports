@@ -1,0 +1,18 @@
+root:
+    [($main)* ($news)*]
+slots:
+    main:
+        source: $main
+    latest:
+        source: $latest
+$main:
+    %lemma
+    главный
+    популярный
+$latest:
+    %lemma
+    последний      
+$news:
+    новости
+filler:
+    $Filler

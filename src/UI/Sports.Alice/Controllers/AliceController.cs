@@ -1,8 +1,8 @@
 ﻿using Castle.Core.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Sports.Alice.Models;
 using Sports.Alice.Services.Interfaces;
-using Yandex.Alice.Sdk.Models;
 
 namespace Sports.Alice.Controllers
 {
@@ -17,7 +17,7 @@ namespace Sports.Alice.Controllers
         }
 
         [HttpPost("/alice")]
-        public IActionResult WebHook([FromBody] AliceRequest request)
+        public IActionResult WebHook([FromBody] SportsRequest request)
         {
             var response = _aliceService.ProcessRequest(request);
             return Ok(response);

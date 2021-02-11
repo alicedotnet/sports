@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
+using Sports.Alice.Models;
 using Sports.Alice.Models.Settings;
 using Sports.Alice.Services;
 using Sports.Alice.Services.Interfaces;
@@ -29,27 +30,41 @@ namespace Sports.Alice.Tests.Services
             : base(testOutputHelper)
         {
             _services = serverFixture.Services;
-            _sportsSettings = _services.GetService<IOptions<SportsSettings>>().Value;
+            _sportsSettings = _services.GetService<SportsSettings>();
         }
 
         [Fact]
         public void GetNews()
         {
-            AliceRequest aliceRequest = new AliceRequest()
+            var aliceRequest = new SportsRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel<object>()
+                Request = new AliceRequestModel<SportsIntents>()
                 {
-                    Nlu = new AliceNLUModel<object>()
+                    Nlu = new AliceNLUModel<SportsIntents>()
                     {
-                        Tokens = new string[] {"новости"}
+                        Intents = new SportsIntents()
+                        {
+                            News = new AliceIntentModel<NewsSlots>()
+                            {
+                                Slots = new NewsSlots()
+                                {
+                                    Latest = new AliceEntityStringModel()
+                                }
+                            }
+                        }
                     }
+                },
+                State = new AliceStateModel<SportsSessionState, object>()
+                {
+                    Session = new SportsSessionState()
                 }
             };
             using var scope = _services.CreateScope();
             var aliceService = scope.ServiceProvider.GetService<IAliceService>();
             var aliceResponse = aliceService.ProcessRequest(aliceRequest);
-            var aliceGalleryResponse = aliceResponse as AliceGalleryResponse;
+            Assert.IsType<SportsGalleryResponse>(aliceResponse);
+            var aliceGalleryResponse = aliceResponse as SportsGalleryResponse;
             Assert.NotNull(aliceGalleryResponse);
             TestOutputHelper.WriteLine($"Response text: {aliceGalleryResponse.Response.Text}");
             Assert.Equal(_sportsSettings.NewsToDisplay, aliceGalleryResponse.Response.Card.Items.Count);
@@ -58,21 +73,35 @@ namespace Sports.Alice.Tests.Services
         [Fact]
         public void GetMainNews()
         {
-            AliceRequest aliceRequest = new AliceRequest()
+            var aliceRequest = new SportsRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel<object>()
+                Request = new AliceRequestModel<SportsIntents>()
                 {
-                    Nlu = new AliceNLUModel<object>()
+                    Nlu = new AliceNLUModel<SportsIntents>()
                     {
-                        Tokens = new string[] { "главные", "новости" }
+                        Intents = new SportsIntents()
+                        {
+                            News = new AliceIntentModel<NewsSlots>()
+                            {
+                                Slots = new NewsSlots()
+                                {
+                                    Main = new AliceEntityStringModel()
+                                }
+                            }
+                        }
                     }
+                },
+                State = new AliceStateModel<SportsSessionState, object>()
+                {
+                    Session = new SportsSessionState()
                 }
             };
             using var scope = _services.CreateScope();
             var aliceService = scope.ServiceProvider.GetService<IAliceService>();
             var aliceResponse = aliceService.ProcessRequest(aliceRequest);
-            var aliceGalleryResponse = aliceResponse as AliceGalleryResponse;
+            Assert.IsType<SportsGalleryResponse>(aliceResponse);
+            var aliceGalleryResponse = aliceResponse as SportsGalleryResponse;
             Assert.NotNull(aliceGalleryResponse);
             TestOutputHelper.WriteLine($"Response text: {aliceGalleryResponse.Response.Text}");
             Assert.Equal(_sportsSettings.NewsToDisplay, aliceGalleryResponse.Response.Card.Items.Count);
@@ -81,21 +110,29 @@ namespace Sports.Alice.Tests.Services
         [Fact]
         public void GetBestComments()
         {
-            AliceRequest aliceRequest = new AliceRequest()
+            var aliceRequest = new SportsRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel<object>()
+                Request = new AliceRequestModel<SportsIntents>()
                 {
-                    Nlu = new AliceNLUModel<object>()
+                    Nlu = new AliceNLUModel<SportsIntents>()
                     {
-                        Tokens = new string[] { "лучшие", "комментарии" }
+                        Intents = new SportsIntents()
+                        {
+                            Comments = new AliceIntentModel()
+                        }
                     }
+                },
+                State = new AliceStateModel<SportsSessionState, object>()
+                {
+                    Session = new SportsSessionState()
                 }
             };
             using var scope = _services.CreateScope();
             var aliceService = scope.ServiceProvider.GetService<IAliceService>();
             var aliceResponse = aliceService.ProcessRequest(aliceRequest);
-            var aliceGalleryResponse = aliceResponse as AliceResponse;
+            Assert.IsType<SportsResponse>(aliceResponse);
+            var aliceGalleryResponse = aliceResponse as SportsResponse;
             Assert.NotNull(aliceGalleryResponse);
             TestOutputHelper.WriteLine($"Response text: {aliceGalleryResponse.Response.Text}");
         }
@@ -103,11 +140,11 @@ namespace Sports.Alice.Tests.Services
         [Fact]
         public void InvalidObject()
         {
-            AliceRequest aliceRequest = null;
+            SportsRequest sportsRequest = null;
             using var scope = _services.CreateScope();
             var aliceService = scope.ServiceProvider.GetService<IAliceService>();
-            var exception = Assert.Throws<ArgumentNullException>(() => aliceService.ProcessRequest(aliceRequest));
-            Assert.Equal(nameof(aliceRequest), exception.ParamName);
+            var exception = Assert.Throws<ArgumentNullException>(() => aliceService.ProcessRequest(sportsRequest));
+            Assert.Equal(nameof(sportsRequest), exception.ParamName);
         }
     }
 }

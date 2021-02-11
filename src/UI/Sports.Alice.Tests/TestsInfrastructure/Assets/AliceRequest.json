@@ -68,7 +68,15 @@
             "day_is_relative": true
           }
         }
-      ]
+      ],
+      "intents": {
+
+      }
+    }
+  },
+  "state": {
+    "session": {
+
     }
   },
   "session": {

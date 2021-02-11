@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sports.Alice.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,6 @@ namespace Sports.Alice.Services.Interfaces
 {
     public interface IAliceService
     {
-        AliceResponseBase ProcessRequest(AliceRequest aliceRequest);
+        IAliceResponseBase ProcessRequest(SportsRequest aliceRequest);
     }
 }

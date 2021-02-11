@@ -1,4 +1,5 @@
 ﻿using Sports.Alice.Models;
+using Sports.Alice.Scenes;
 using Sports.Alice.Tests.TestsInfrastructure;
 using Sports.Alice.Tests.TestsInfrastructure.Fixtures;
 using Sports.Common.Tests;
@@ -39,13 +40,23 @@ namespace Sports.Alice.Tests.Controllers
         [Fact]
         public async Task TestBestCommentsPayload()
         {
-            var aliceRequest = new AliceRequest()
+            var aliceRequest = new SportsRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel<object>()
+                Request = new AliceRequestModel<SportsIntents>()
                 {
                     Type = AliceRequestType.ButtonPressed,
-                    Payload = new AliceCommand(AliceCommandType.BestComments)
+                    Nlu = new AliceNLUModel<SportsIntents>()
+                    {
+                        Intents = new SportsIntents()
+                        {
+                            Comments = new AliceIntentModel()
+                        }
+                    }
+                },
+                State = new AliceStateModel<SportsSessionState, object>()
+                {
+                    Session = new SportsSessionState()
                 }
             };
             string json = JsonSerializer.Serialize(aliceRequest);
@@ -59,13 +70,28 @@ namespace Sports.Alice.Tests.Controllers
         [Fact]
         public async Task TestLatestNewsPayload()
         {
-            var aliceRequest = new AliceRequest()
+            var aliceRequest = new SportsRequest()
             {
                 Session = new AliceSessionModel(),
-                Request = new AliceRequestModel<object>()
+                Request = new AliceRequestModel<SportsIntents>()
                 {
-                    Type = AliceRequestType.ButtonPressed,
-                    Payload = new AliceCommand(AliceCommandType.LatestNews)
+                    Nlu = new AliceNLUModel<SportsIntents>()
+                    {
+                        Intents = new SportsIntents()
+                        {
+                            News = new AliceIntentModel<NewsSlots>()
+                            {
+                                Slots = new NewsSlots()
+                                {
+                                    Latest = new AliceEntityStringModel()
+                                }
+                            }
+                        }
+                    }
+                },
+                State = new AliceStateModel<SportsSessionState, object>()
+                {
+                    Session = new SportsSessionState()
                 }
             };
             string json = JsonSerializer.Serialize(aliceRequest);

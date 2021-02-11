@@ -1,265 +1,83 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
 using Sports.Alice.Models;
-using Sports.Alice.Models.Settings;
-using Sports.Alice.Resources;
+using Sports.Alice.Scenes;
 using Sports.Alice.Services.Interfaces;
-using Sports.Common.Extensions;
-using Sports.Models;
-using Sports.Services.Interfaces;
 using System;
-using System.Buffers;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
-using Yandex.Alice.Sdk.Helpers;
 using Yandex.Alice.Sdk.Models;
 
 namespace Sports.Alice.Services
 {
     public class AliceService : IAliceService
     {
-        private readonly INewsService _newsService;
-        private readonly INewsArticleCommentService _newsArticleCommentService;
-        private readonly SportsSettings _sportsSettings;
+        private readonly IScenesProvider _scenesProvider;
+        private readonly ILogger _fallbackLogger;
 
-        public AliceService(INewsService newsService, INewsArticleCommentService newsArticleCommentService, IOptions<SportsSettings> sportsSettings)
+        public AliceService(IScenesProvider scenesProvider, ILoggerFactory loggerFactory)
         {
-            if (sportsSettings == null)
-            {
-                throw new ArgumentNullException(nameof(sportsSettings));
-            }
-            _newsService = newsService;
-            _newsArticleCommentService = newsArticleCommentService;
-            _sportsSettings = sportsSettings.Value;
+            _scenesProvider = scenesProvider;
+            _fallbackLogger = loggerFactory.CreateLogger("Fallback");
         }
 
-        public AliceResponseBase ProcessRequest(AliceRequest aliceRequest)
+        public IAliceResponseBase ProcessRequest(SportsRequest sportsRequest)
         {
-            if (aliceRequest == null)
+            if (sportsRequest == null)
             {
-                throw new ArgumentNullException(nameof(aliceRequest));
+                throw new ArgumentNullException(nameof(sportsRequest));
             }
 
-            AliceCommand aliceCommand = new AliceCommand();
-            if (aliceRequest.Session.New)
+            if(sportsRequest.Request.OriginalUtterance == "ping")
             {
-                aliceCommand.Type = AliceCommandType.LatestNews;
+                return new SportsResponse(sportsRequest, "Привет, Яндекс! У меня все в порядке :)");
             }
-            else if (aliceRequest.Request.Type == AliceRequestType.ButtonPressed &&
-                aliceRequest.Request.Payload is JsonElement element &&
-                element.ValueKind == JsonValueKind.Object)
+
+            SceneType currentSceneType = SceneType.Undefined;
+            if (sportsRequest.Session.New)
             {
-                aliceCommand = element.ToObject<AliceCommand>();
+                currentSceneType = SceneType.LatestNews;
+                sportsRequest.State.Session = new SportsSessionState();
             }
-            else if (aliceRequest.Request.Nlu.Tokens.Contains("новости"))
+
+            if(sportsRequest.Request.Nlu.Intents.News != null)
             {
-                if (aliceRequest.Request.Nlu.Tokens.Contains("главные") || aliceRequest.Request.Nlu.Tokens.Contains("популярные"))
+                if (sportsRequest.Request.Nlu.Intents.News.Slots.Main != null)
                 {
-                    aliceCommand.Type = AliceCommandType.MainNews;
+                    currentSceneType = SceneType.MainNews;
                 }
                 else
                 {
-                    aliceCommand.Type = AliceCommandType.LatestNews;
+                    currentSceneType = SceneType.LatestNews;
                 }
             }
-            else if (aliceRequest.Request.Nlu.Tokens.Contains("комментарии")
-                || aliceRequest.Request.Nlu.Tokens.Contains("комментарий"))
+            else if (sportsRequest.Request.Nlu.Intents.Comments != null)
             {
-                aliceCommand.Type = AliceCommandType.BestComments;
+                currentSceneType = SceneType.BestComments;
             }
-            else if(aliceRequest.Request.Nlu.Tokens.Contains("дальше") &&
-                aliceRequest.State != null && 
-                aliceRequest.State.Session is JsonElement sessionElement &&
-                sessionElement.ValueKind == JsonValueKind.Object)
+            else if(sportsRequest.Request.Nlu.Intents.IsHelp)
             {
-                var state = sessionElement.ToObject<CustomSessionState>();
-                aliceCommand.Type = AliceCommandType.BestComments;
-                aliceCommand.Payload = state.NextNewsArticleId;
+                currentSceneType = SceneType.Help;
             }
 
-            return aliceCommand.Type switch
+            Scene currentScene;
+            if (currentSceneType != SceneType.Undefined)
             {
-                AliceCommandType.LatestNews => GetLatestNews(aliceRequest),
-                AliceCommandType.MainNews => GetMainNews(aliceRequest),
-                AliceCommandType.BestComments => GetBestComments(aliceRequest, aliceCommand.Payload),
-                _ => GetHelp(aliceRequest),
-            };
-        }
-
-        private AliceResponseBase GetLatestNews(AliceRequest aliceRequest)
-        {
-            var buttons = new List<AliceButtonModel>()
-                {
-                    new AliceButtonModel(Sports_Resources.Command_MainNews, true, new AliceCommand(AliceCommandType.MainNews), null),
-                    new AliceButtonModel(Sports_Resources.Command_BestComments, true, new AliceCommand(AliceCommandType.BestComments), null)
-                };
-            var news = _newsService.GetLatestNews(_sportsSettings.NewsToDisplay);
-            if (news.Any())
-            {
-                var titles = news.Select(x => x.Title);
-                string text = $"{Sports_Resources.LatestNews_Header_Tts}\n\n{string.Join("\n\n", titles)}";
-                string tts = $"{Sports_Resources.LatestNews_Header_Tts}{AliceHelper.SilenceString500}{string.Join(AliceHelper.SilenceString500, titles)}{AliceHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
-                var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
-                response.Response.Card = new AliceGalleryCardModel
-                {
-                    Items = new List<AliceGalleryCardItem>(),
-                    Header = new AliceGalleryCardHeaderModel(Sports_Resources.LatestNews_Header)
-                };
-                foreach (var newsArticle in news)
-                {
-                    response.Response.Card.Items.Add(new AliceGalleryCardItem()
-                    {
-                        Title = AliceHelper
-                            .PrepareGalleryCardItemTitle(newsArticle.Title, GetTitleEnding(newsArticle), AliceHelper.DefaultReducedStringEnding),
-                        Button = new AliceImageCardButtonModel()
-                        {
-                            Url = newsArticle.Url
-                        }
-                    });
-                }
-                return response;
+                sportsRequest.State.Session.CurrentScene = currentSceneType;
+                currentScene = _scenesProvider.GetScene(currentSceneType);
+                return currentScene.Reply(sportsRequest);
             }
             else
             {
-                return new AliceResponse(aliceRequest, Sports_Resources.LatestNews_NoNews, buttons);
-            }
-        }
-
-        private AliceResponseBase GetMainNews(AliceRequest aliceRequest)
-        {
-            var buttons = new List<AliceButtonModel>()
+                currentScene = _scenesProvider.GetScene(sportsRequest.State.Session.CurrentScene);
+                var nextScene = currentScene.MoveToNextScene(sportsRequest);
+                if(nextScene != null)
                 {
-                    new AliceButtonModel(Sports_Resources.Command_LatestNews, true, new AliceCommand(AliceCommandType.LatestNews), null),
-                    new AliceButtonModel(Sports_Resources.Command_BestComments, true, new AliceCommand(AliceCommandType.BestComments), null)
-                };
-            var news = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), _sportsSettings.NewsToDisplay);
-            if (news.Any())
-            {
-                var titles = news.Select(x => x.Title);
-                string text = $"{Sports_Resources.MainNews_Header_Tts}\n\n{string.Join("\n\n", titles)}";
-                string tts = $"{Sports_Resources.MainNews_Header_Tts}{AliceHelper.SilenceString500}{string.Join(AliceHelper.SilenceString500, titles)}{AliceHelper.SilenceString1000}{Sports_Resources.Tips_Help}";
-                var response = new AliceGalleryResponse(aliceRequest, text, tts, buttons);
-                response.Response.Card = new AliceGalleryCardModel
-                {
-                    Items = new List<AliceGalleryCardItem>(),
-                    Header = new AliceGalleryCardHeaderModel(Sports_Resources.MainNews_Header)
-                };
-                foreach (var newsArticle in news)
-                {
-                    response.Response.Card.Items.Add(new AliceGalleryCardItem()
-                    {
-                        Title = AliceHelper
-                            .PrepareGalleryCardItemTitle(newsArticle.Title, GetTitleEnding(newsArticle), AliceHelper.DefaultReducedStringEnding),
-                        Button = new AliceImageCardButtonModel()
-                        {
-                            Url = newsArticle.Url
-                        }
-                    });
-                }
-                return response;
-            }
-            else
-            {
-                return new AliceResponse(aliceRequest, Sports_Resources.MainNews_NoNews, buttons);
-            }
-        }
-
-        private AliceResponseBase GetBestComments(AliceRequest aliceRequest, object payload)
-        {
-            var fromDate = DateTimeOffset.Now.AddDays(-1);
-            NewsArticleModel newsArticle;
-            if ((payload is Guid id) || (payload is JsonElement element && 
-                element.ValueKind == JsonValueKind.String &&
-                Guid.TryParse(element.GetString(), out id)))
-            {
-                newsArticle = _newsService.GetById(id);
-            }
-            else
-            {
-                newsArticle = _newsService.GetPopularNews(fromDate, 1).FirstOrDefault();
-            }
-            if (newsArticle != null)
-            {
-                var comments = _newsArticleCommentService.GetBestComments(newsArticle.Id, _sportsSettings.CommentsToDisplay);
-                if (comments != null && comments.Any())
-                {
-                    var buttons = new List<AliceButtonModel>()
-                    {
-                        new AliceButtonModel()
-                        {
-                            Title = Sports_Resources.Command_BestComments_OpenNewsArticle,
-                            Url = newsArticle.Url,
-                            Hide = true
-                        }
-                    };
-                    string ttsEnding = string.Empty;
-                    var nextNewsArticle = _newsService.GetNextPopularNewsArticle(fromDate, newsArticle.Id);
-                    CustomSessionState sessionState = null;
-                    if (nextNewsArticle != null)
-                    {
-                        ttsEnding = $"{AliceHelper.SilenceString500}{Sports_Resources.Tips_BestComments_Next}";
-                        buttons.Add(new AliceButtonModel()
-                        {
-                            Title = Sports_Resources.Command_BestComments_Next,
-                            Payload = new AliceCommand(AliceCommandType.BestComments, nextNewsArticle.Id),
-                            Hide = true
-                        });
-                        sessionState = new CustomSessionState()
-                        {
-                            NextNewsArticleId = nextNewsArticle.Id
-                        };
-
-                    }
-                    buttons.Add(new AliceButtonModel(Sports_Resources.Command_LatestNews, true, new AliceCommand(AliceCommandType.LatestNews), null));
-                    buttons.Add(new AliceButtonModel(Sports_Resources.Command_MainNews, true, new AliceCommand(AliceCommandType.MainNews), null));
-
-                    var text = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
-                    var tts = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title}\"{AliceHelper.SilenceString500}");
-                    foreach (var comment in comments)
-                    {
-                        string textComment = $"\n\n{EmojiLibrary.SpeechBalloon} {comment.CommentText} {EmojiLibrary.ThumbsUp}{comment.CommentRating}";
-                        string textTts = $"{AliceHelper.SilenceString500}{comment.CommentText}";
-                        if (text.Length + textComment.Length <= AliceResponseModel.TextMaxLenght
-                            && tts.Length + textTts.Length + ttsEnding.Length <= AliceResponseModel.TtsMaxLenght)
-                        {
-                            text.Append(textComment);
-                            tts.Append(textTts);
-                        }
-                    }
-                    tts.Append(ttsEnding);
-
-                    var response = new AliceResponse(aliceRequest, text.ToString(), tts.ToString(), buttons)
-                    {
-                        SessionState = sessionState
-                    };
-                    return response;
+                    return nextScene.Reply(sportsRequest);
                 }
             }
-            var noResponseButtons = new List<AliceButtonModel>()
-            {
-                new AliceButtonModel(Sports_Resources.Command_LatestNews, true, new AliceCommand(AliceCommandType.LatestNews), null),
-                new AliceButtonModel(Sports_Resources.Command_MainNews, true, new AliceCommand(AliceCommandType.MainNews), null)
-            };
-            return new AliceResponse(aliceRequest, Sports_Resources.BestComments_NoComments, noResponseButtons);
-        }
 
-        private static AliceResponseBase GetHelp(AliceRequest aliceRequest)
-        {
-            var buttons = new List<AliceButtonModel>()
-                {
-                    new AliceButtonModel(Sports_Resources.Command_LatestNews, false, new AliceCommand(AliceCommandType.LatestNews), null),
-                    new AliceButtonModel(Sports_Resources.Command_MainNews, false, new AliceCommand(AliceCommandType.MainNews), null),
-                    new AliceButtonModel(Sports_Resources.Command_BestComments, false, new AliceCommand(AliceCommandType.BestComments), null)
-                };
-            return new AliceResponse(aliceRequest, Sports_Resources.Help_Text_Tts, buttons);
-        }
-
-        private static string GetTitleEnding(NewsArticleModel newsArticle)
-        {
-            return newsArticle.IsHotContent ? $" {EmojiLibrary.FireEmoji} {newsArticle.CommentsCount}"
-                : newsArticle.CommentsCount > 0 ? $" {EmojiLibrary.SpeechBalloon} {newsArticle.CommentsCount} "
-                    : string.Empty;
+            _fallbackLogger.LogInformation($"FALLBACK. Request: {0}", JsonSerializer.Serialize(sportsRequest));
+            return currentScene.Fallback(sportsRequest);
         }
     }
 }

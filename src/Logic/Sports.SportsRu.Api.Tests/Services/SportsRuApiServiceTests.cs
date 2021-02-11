@@ -87,7 +87,7 @@ namespace Sports.SportsRu.Api.Tests.Services
             WritePrettyJson(commentsByIdsResponse.Content);
         }
 
-        //[Fact]
+        [Fact]
         public async Task GetHotContent()
         {
             var hotContentResponse = await _sportsRuApiService.GetHotContentAsync().ConfigureAwait(false);

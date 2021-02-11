@@ -7,3 +7,5 @@ services:
     ports:
       - "8000:80"
       - "8001:443"
+    environment:
+      - ApplicationInsights__InstrumentationKey=${APPLICATIONINSIGHTS__INSTRUMENTATIONKEY}

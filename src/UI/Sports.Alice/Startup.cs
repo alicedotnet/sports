@@ -45,6 +45,7 @@ namespace Sports.Alice
             services.AddScoped<INewsArticleCommentService, NewsArticleCommentService>();
 
             services.AddScoped<IScenesProvider, ScenesProvider>();
+            services.AddScoped<WelcomeScene>();
             services.AddScoped<LatestNewsScene>();
             services.AddScoped<MainNewsScene>();
             services.AddScoped<BestCommentsScene>();

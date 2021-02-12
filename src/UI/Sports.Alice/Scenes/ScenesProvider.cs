@@ -19,6 +19,7 @@ namespace Sports.Alice.Scenes
         {
             return sceneType switch
             {
+                SceneType.Welcome => GetScene<WelcomeScene>(),
                 SceneType.LatestNews => GetScene<LatestNewsScene>(),
                 SceneType.MainNews => GetScene<MainNewsScene>(),
                 SceneType.BestComments => GetScene<BestCommentsScene>(),

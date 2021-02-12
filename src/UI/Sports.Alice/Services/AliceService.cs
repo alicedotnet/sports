@@ -37,7 +37,7 @@ namespace Sports.Alice.Services
             SceneType currentSceneType = SceneType.Undefined;
             if (sportsRequest.Session.New)
             {
-                currentSceneType = SceneType.LatestNews;
+                currentSceneType = SceneType.Welcome;
                 sportsRequest.State.Session = new SportsSessionState();
             }
 

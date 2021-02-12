@@ -203,5 +203,14 @@ namespace Sports.Alice.Resources {
                 return ResourceManager.GetString("Tips.Help", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Привет! Вы можете попросить меня прочитать последние или главные новости спорта, а также лучшие комментарии под главными новостями с сайта sports.ru.
+        /// </summary>
+        internal static string Welcome_Text {
+            get {
+                return ResourceManager.GetString("Welcome.Text", resourceCulture);
+            }
+        }
     }
 }

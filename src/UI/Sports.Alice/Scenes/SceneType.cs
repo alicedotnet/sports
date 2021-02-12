@@ -8,6 +8,7 @@ namespace Sports.Alice.Scenes
     public enum SceneType
     {
         Undefined,
+        Welcome,
         LatestNews,
         MainNews,
         BestComments,

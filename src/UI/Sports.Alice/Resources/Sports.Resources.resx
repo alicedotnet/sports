@@ -165,4 +165,7 @@
   <data name="Tips.Help" xml:space="preserve">
     <value>Чтобы узнать дополнительные возможности скажите: помощь</value>
   </data>
+  <data name="Welcome.Text" xml:space="preserve">
+    <value>Привет! Вы можете попросить меня прочитать последние или главные новости спорта, а также лучшие комментарии под главными новостями с сайта sports.ru</value>
+  </data>
 </root>

@@ -2,8 +2,10 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using Sports.Data.Context;
+using Sports.Data.Services;
 using Sports.Services;
 using Sports.Services.Interfaces;
+using Sports.SportsRu.Api;
 using Sports.SportsRu.Api.Services;
 using Sports.SportsRu.Api.Services.Interfaces;
 using System;
@@ -22,14 +24,20 @@ namespace Sports.Tests.TestsInfrastructure.Fixtures
         public SportsFixture()
         {
             var builder = new DbContextOptionsBuilder();
-            builder.UseInMemoryDatabase("sports");
+            builder
+                .UseLazyLoadingProxies()
+                .UseSqlite("Data Source=sports.db");
             SportsContext = new SportsContext(builder.Options);
+            SportsContext.Database.EnsureDeleted();
+            SportsContext.Database.EnsureCreated();
 
             var sportsRuLogger = Mock.Of<ILogger<SportsRuApiService>>();
-            ISportsRuApiService sportsRuApiService = new SportsRuApiService(sportsRuLogger);
-            NewsService = new NewsService(SportsContext);
+            var sportsRuApiSettings = new SportsRuApiSettings("https://www.sports.ru", "https://stat.sports.ru");
+            ISportsRuApiService sportsRuApiService = new SportsRuApiService(sportsRuApiSettings, sportsRuLogger);
+            var newsArticleDataService = new NewsArticleDataService(SportsContext);
+            NewsService = new NewsService(SportsContext, newsArticleDataService);
             var syncServiceLogger = Mock.Of<ILogger<SyncService>>();
-            SyncService = new SyncService(SportsContext, sportsRuApiService, NewsService, syncServiceLogger);
+            SyncService = new SyncService(SportsContext, sportsRuApiService, newsArticleDataService, syncServiceLogger);
             NewsArticleCommentService = new NewsArticleCommentService(SportsContext);
         }
     }

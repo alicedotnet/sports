@@ -9,6 +9,7 @@ namespace Sports.Services.Interfaces
     {
         Task SyncNewsAsync();
         Task SyncPopularNewsCommentsAsync(DateTimeOffset fromDate, int newsCount);
+        Task SyncPopularNewsCommentsAsync();
         void DeleteOldData(DateTimeOffset oldestDateToKeep);
     }
 }

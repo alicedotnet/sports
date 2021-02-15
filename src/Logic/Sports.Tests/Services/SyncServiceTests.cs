@@ -1,13 +1,16 @@
 ﻿using Sports.Common.Tests;
 using Sports.Data.Context;
 using Sports.Data.Entities;
+using Sports.Services;
 using Sports.Services.Interfaces;
+using Sports.SportsRu.Api.Models;
 using Sports.Tests.TestsInfrastructure;
 using Sports.Tests.TestsInfrastructure.Fixtures;
 using Sports.Tests.TestsInfrastructure.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -90,6 +93,29 @@ namespace Sports.Tests.Services
             _syncService.DeleteOldData(DateTimeOffset.Now);
             Assert.False(_sportsContext.NewsArticlesComments.Any());
             Assert.False(_sportsContext.NewsArticles.Any());
+        }
+
+        [Fact]
+        public void SyncService_Map_ReplaceQuot()
+        {
+            Type type = typeof(SyncService);
+            //var hello = Activator.CreateInstance(type, firstName, lastName);
+            var syncService = new SyncService(null, null, null, null);
+            MethodInfo mapMethod = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+                .Where(x => x.Name == "Map" && x.IsPrivate)
+                .First();
+
+            string initialText = "&quot;это&quot;";
+            CommentInfo from = new CommentInfo()
+            {
+                Rating = new CommentRating(),
+                Text = initialText
+            };
+            NewsArticleComment to = new NewsArticleComment();
+            mapMethod.Invoke(syncService, new object[] { from, to });
+            Assert.NotEqual(from.Text, to.Text);
+            string mappedText = "\"это\"";
+            Assert.Equal(mappedText, to.Text);
         }
     }
 }

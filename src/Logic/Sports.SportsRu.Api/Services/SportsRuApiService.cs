@@ -16,21 +16,21 @@ using System.Threading.Tasks;
 
 namespace Sports.SportsRu.Api.Services
 {
-    public class SportsRuApiService : ISportsRuApiService, IDisposable
+    public class SportsRuApiService : ISportsRuApiService
     {
         private readonly HttpClient _httpClient;
-        protected HttpClient StatHttpClient { get; set; }
+        private readonly HttpClient _statHttpClient;
         private readonly ILogger<SportsRuApiService> _logger;
 
-        public SportsRuApiService(ILogger<SportsRuApiService> logger)
+        public SportsRuApiService(SportsRuApiSettings sportsRuApiSettings, ILogger<SportsRuApiService> logger)
         {
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri("https://www.sports.ru")
+                BaseAddress = sportsRuApiSettings.SportsRuBaseAddress
             };
-            StatHttpClient = new HttpClient()
+            _statHttpClient = new HttpClient()
             {
-                BaseAddress = new Uri("https://stat.sports.ru")
+                BaseAddress = sportsRuApiSettings.SportsRuStatBaseAddress
             };
             _logger = logger;
         }
@@ -115,7 +115,7 @@ namespace Sports.SportsRu.Api.Services
 
         private async Task<ServiceResponse<T>> GetResponseFromStatAsync<T>(Uri requestUri)
         {
-            return await GetResponseAsync<T>(requestUri, StatHttpClient).ConfigureAwait(false);
+            return await GetResponseAsync<T>(requestUri, _statHttpClient).ConfigureAwait(false);
         }
 
         private async Task<ServiceResponse<T>> GetResponseAsync<T>(Uri requestUri, HttpClient httpClient)
@@ -151,37 +151,5 @@ namespace Sports.SportsRu.Api.Services
                 return ServiceResponseFactory.Error<T>(SportsRuApiResources.Error_Unknown);
             }
         }
-
-        #region IDisposable Support
-        private bool _disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    _httpClient.Dispose();
-                    StatHttpClient.Dispose();
-                }
-
-                _disposedValue = true;
-            }
-        }
-
-        // ~SportsRuApiService()
-        // {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 }

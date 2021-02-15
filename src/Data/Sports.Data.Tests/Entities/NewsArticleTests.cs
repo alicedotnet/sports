@@ -12,8 +12,12 @@ namespace Sports.Data.Tests.Entities
         public void TestCreation()
         {
             var builder = new DbContextOptionsBuilder();
-            builder.UseInMemoryDatabase("sports");
+            builder
+                .UseLazyLoadingProxies()
+                .UseSqlite("Data Source=sports.db");
             using var db = new SportsContext(builder.Options);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
             var article = new NewsArticle() { Title = "test" };
             db.NewsArticles.Add(article);
             db.SaveChanges();

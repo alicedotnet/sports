@@ -22,7 +22,7 @@ namespace Sports.Alice.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Sports_Resources {
+    public class Sports_Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Sports.Alice.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Sports.Alice.Resources.Sports.Resources", typeof(Sports_Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Sports.Alice.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to У меня нет лучших комментариев.
         /// </summary>
-        internal static string BestComments_NoComments {
+        public static string BestComments_NoComments {
             get {
                 return ResourceManager.GetString("BestComments.NoComments", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Лучшие комментарии под новостью.
         /// </summary>
-        internal static string BestComments_Title_Tts {
+        public static string BestComments_Title_Tts {
             get {
                 return ResourceManager.GetString("BestComments.Title.Tts", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to лучшие комментарии.
         /// </summary>
-        internal static string Command_BestComments {
+        public static string Command_BestComments {
             get {
                 return ResourceManager.GetString("Command.BestComments", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to дальше.
         /// </summary>
-        internal static string Command_BestComments_Next {
+        public static string Command_BestComments_Next {
             get {
                 return ResourceManager.GetString("Command.BestComments.Next", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to к новости.
         /// </summary>
-        internal static string Command_BestComments_OpenNewsArticle {
+        public static string Command_BestComments_OpenNewsArticle {
             get {
                 return ResourceManager.GetString("Command.BestComments.OpenNewsArticle", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to последние новости.
         /// </summary>
-        internal static string Command_LatestNews {
+        public static string Command_LatestNews {
             get {
                 return ResourceManager.GetString("Command.LatestNews", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to главные новости.
         /// </summary>
-        internal static string Command_MainNews {
+        public static string Command_MainNews {
             get {
                 return ResourceManager.GetString("Command.MainNews", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Вы можете попросить меня прочитать последние или главные новости спорта, а также лучшие комментарии под главными новостями.
         /// </summary>
-        internal static string Help_Text_Tts {
+        public static string Help_Text_Tts {
             get {
                 return ResourceManager.GetString("Help.Text.Tts", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Последние новости.
         /// </summary>
-        internal static string LatestNews_Header {
+        public static string LatestNews_Header {
             get {
                 return ResourceManager.GetString("LatestNews.Header", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Вот последние новости.
         /// </summary>
-        internal static string LatestNews_Header_Tts {
+        public static string LatestNews_Header_Tts {
             get {
                 return ResourceManager.GetString("LatestNews.Header.Tts", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to У меня нет последний новостей.
         /// </summary>
-        internal static string LatestNews_NoNews {
+        public static string LatestNews_NoNews {
             get {
                 return ResourceManager.GetString("LatestNews.NoNews", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Главные новости.
         /// </summary>
-        internal static string MainNews_Header {
+        public static string MainNews_Header {
             get {
                 return ResourceManager.GetString("MainNews.Header", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Вот главные новости.
         /// </summary>
-        internal static string MainNews_Header_Tts {
+        public static string MainNews_Header_Tts {
             get {
                 return ResourceManager.GetString("MainNews.Header.Tts", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to У меня нет главных новостей.
         /// </summary>
-        internal static string MainNews_NoNews {
+        public static string MainNews_NoNews {
             get {
                 return ResourceManager.GetString("MainNews.NoNews", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to для перехода к следующий новости скажите: дальше.
         /// </summary>
-        internal static string Tips_BestComments_Next {
+        public static string Tips_BestComments_Next {
             get {
                 return ResourceManager.GetString("Tips.BestComments.Next", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Чтобы узнать дополнительные возможности скажите: помощь.
         /// </summary>
-        internal static string Tips_Help {
+        public static string Tips_Help {
             get {
                 return ResourceManager.GetString("Tips.Help", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace Sports.Alice.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Привет! Вы можете попросить меня прочитать последние или главные новости спорта, а также лучшие комментарии под главными новостями с сайта sports.ru.
         /// </summary>
-        internal static string Welcome_Text {
+        public static string Welcome_Text {
             get {
                 return ResourceManager.GetString("Welcome.Text", resourceCulture);
             }

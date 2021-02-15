@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sports.Data.Context;
 using Sports.Data.Entities;
+using Sports.Data.Services.Interfaces;
 using Sports.Services.Interfaces;
 using Sports.SportsRu.Api.Helpers;
 using Sports.SportsRu.Api.Models;
@@ -19,15 +20,15 @@ namespace Sports.Services
     {
         private readonly SportsContext _sportsContext;
         private readonly ISportsRuApiService _sportsRuApiService;
-        private readonly INewsService _newsService;
+        private readonly INewsArticleDataService _newsArticleDataService;
         private readonly ILogger<SyncService> _logger;
 
         public SyncService(SportsContext sportsContext, ISportsRuApiService sportsRuApiService
-            , INewsService newsService, ILogger<SyncService> logger)
+            , INewsArticleDataService newsArticleDataService, ILogger<SyncService> logger)
         {
             _sportsContext = sportsContext;
             _sportsRuApiService = sportsRuApiService;
-            _newsService = newsService;
+            _newsArticleDataService = newsArticleDataService;
             _logger = logger;
         }
 
@@ -73,7 +74,7 @@ namespace Sports.Services
 
         public async Task SyncPopularNewsCommentsAsync(DateTimeOffset fromDate, int newsCount)
         {
-            var popularNews = _newsService.GetPopularNews(fromDate, newsCount);
+            var popularNews = _newsArticleDataService.GetPopularNews(fromDate, newsCount).ToArray();
             foreach (var newsArticle in popularNews)
             {
                 if(int.TryParse(newsArticle.ExternalId, out int id))
@@ -91,7 +92,8 @@ namespace Sports.Services
                                 {
                                     var newComment = new NewsArticleComment()
                                     {
-                                        NewsArticleId = newsArticle.Id,
+                                        NewsArticleId = newsArticle.NewsArticleId,
+                                        NewsArticle = newsArticle,
                                         ExternalId = comment.Id.ToString(CultureInfo.InvariantCulture),
                                     };
                                     Map(comment, newComment);
@@ -127,7 +129,9 @@ namespace Sports.Services
         private static void Map(CommentInfo from, NewsArticleComment to)
         {
             to.Rating = from.Rating.Plus + from.Rating.Minus;
-            to.Text = from.Text.Replace("<br />", "\n", StringComparison.OrdinalIgnoreCase);
+            to.Text = from.Text
+                .Replace("<br />", "\n", StringComparison.OrdinalIgnoreCase)
+                .Replace("&quot;", "\"", StringComparison.OrdinalIgnoreCase);
         }
 
         private static void Map(NewsArticleInfo from, NewsArticle to, IEnumerable<int> hotNewsIds)
@@ -139,6 +143,13 @@ namespace Sports.Services
             to.PublishedDate = DateTimeOffset
                         .FromUnixTimeSeconds(from.Published.Timestamp)
                         .UtcDateTime;
+            to.CategoryName = from.Section?.Name;
+        }
+
+        public async Task SyncPopularNewsCommentsAsync()
+        {
+            await SyncPopularNewsCommentsAsync(DateTimeOffset.UtcNow.AddDays(-1), 10)
+                .ConfigureAwait(false);
         }
     }
 }

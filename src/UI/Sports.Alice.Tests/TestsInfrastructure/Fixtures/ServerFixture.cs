@@ -6,6 +6,7 @@ using Sports.Alice.Workers;
 using Sports.Common.Tests.Extensions;
 using Sports.Data.Context;
 using Sports.Data.Entities;
+using Sports.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,9 +29,12 @@ namespace Sports.Alice.Tests.TestsInfrastructure.Fixtures
                 {
                     webBuilder.UseTestServer();
                 })
-                .Start();
+                .Build();
+            var sportsContext = host.Services.GetService<SportsContext>();
+            sportsContext.Database.EnsureDeleted();
+            Program.InitializeAsync(host.Services).Wait();
+            host.Start();
             Services = host.Services;
-            InitializeDatabase(Services);
             TestServer testServer = host.GetTestServer();
             HttpClient = testServer.CreateClient();
         }
@@ -40,24 +44,6 @@ namespace Sports.Alice.Tests.TestsInfrastructure.Fixtures
             services.RemoveWorker<SyncNewsWorker>();
             services.RemoveWorker<SyncNewsCommentsWorker>();
             services.RemoveWorker<CleanWorker>();
-
-            services.AddDbContext<SportsContext>(builder => builder.UseInMemoryDatabase("sports"));
-        }
-
-        private static void InitializeDatabase(IServiceProvider services)
-        {
-            using var scope = services.CreateScope();
-            var context = scope.ServiceProvider.GetService<SportsContext>();
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
-            if(!context.NewsArticles.Any())
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    context.NewsArticles.Add(new NewsArticle() { Title = "test", PublishedDate = DateTime.Now });
-                }
-                context.SaveChanges();
-            }
         }
     }
 }

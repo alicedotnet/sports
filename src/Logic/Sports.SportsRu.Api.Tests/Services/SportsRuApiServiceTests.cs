@@ -1,17 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using Moq.Protected;
 using Sports.Common.Tests;
 using Sports.SportsRu.Api.Models;
+using Sports.SportsRu.Api.Resources;
 using Sports.SportsRu.Api.Services;
 using Sports.SportsRu.Api.Services.Interfaces;
 using Sports.SportsRu.Api.Tests.TestsInfrastructure;
 using Sports.SportsRu.Api.Tests.TestsInfrastructure.Fixtures;
-using Sports.SportsRu.Api.Tests.TestsInfrastructure.Mocks;
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -48,6 +43,8 @@ namespace Sports.SportsRu.Api.Tests.Services
                 {
                     Assert.NotEmpty(newsArticle.ContentOption.Name);
                 }
+                Assert.NotNull(newsArticle.Section);
+                Assert.NotNull(newsArticle.Section.Name);
             }
             WritePrettyJson(newsResponse.Content);
         }
@@ -100,32 +97,11 @@ namespace Sports.SportsRu.Api.Tests.Services
         [Fact]
         public async Task GetHotContent_ErrorResponse()
         {
-            using var responseMock = new HttpResponseMessage(HttpStatusCode.BadGateway)
-            {
-                ReasonPhrase = "Bad Gateway"
-            };
-            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            handlerMock
-               .Protected()
-               .Setup<Task<HttpResponseMessage>>(
-                  "SendAsync",
-                  ItExpr.IsAny<HttpRequestMessage>(),
-                  ItExpr.IsAny<CancellationToken>()
-               )
-               .ReturnsAsync(responseMock)
-               .Verifiable();
-            handlerMock
-                .Protected()
-                .Setup("Dispose", ItExpr.IsAny<bool>());
-
-            var statHttpClientMock = new HttpClient(handlerMock.Object)
-            {
-                BaseAddress = new Uri("https://anyvalid.url")
-            };
-            using var sportsRuApiService = new SportsRuApiServiceMock(statHttpClientMock, Mock.Of<ILogger<SportsRuApiService>>());
+            var sportsRuApiSettings = new SportsRuApiSettings("https://www.sports.ru", "https://anyvalid.url");
+            var sportsRuApiService = new SportsRuApiService(sportsRuApiSettings, Mock.Of<ILogger<SportsRuApiService>>());
             var hotContentResponse = await sportsRuApiService.GetHotContentAsync().ConfigureAwait(false);
             Assert.False(hotContentResponse.IsSuccess);
-            Assert.Equal(responseMock.ReasonPhrase, hotContentResponse.ErrorMessage);
+            Assert.Equal(SportsRuApiResources.Error_Unknown, hotContentResponse.ErrorMessage);
         }
     }
 }

@@ -11,14 +11,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Sports.Alice.Infrastructure;
 using Sports.Alice.Models.Settings;
 using Sports.Alice.Scenes;
 using Sports.Alice.Services;
 using Sports.Alice.Services.Interfaces;
 using Sports.Alice.Workers;
 using Sports.Data.Context;
+using Sports.Data.Services;
+using Sports.Data.Services.Interfaces;
 using Sports.Services;
 using Sports.Services.Interfaces;
+using Sports.SportsRu.Api;
 using Sports.SportsRu.Api.Services;
 using Sports.SportsRu.Api.Services.Interfaces;
 
@@ -38,9 +42,15 @@ namespace Sports.Alice
         {
             services.AddControllers();
 
+            string connectionString = Configuration.GetConnectionString("database");
+            services.AddDbContext<SportsContext>(builder
+                => builder.ConfigureSportsContextOptions(connectionString));
+
+            services.AddScoped<INewsArticleDataService, NewsArticleDataService>();
+
             services.AddScoped<IAliceService, AliceService>();
             services.AddScoped<ISyncService, SyncService>();
-            services.AddScoped<ISportsRuApiService, SportsRuApiService>();
+            services.AddSingleton<ISportsRuApiService, SportsRuApiService>();
             services.AddScoped<INewsService, NewsService>();
             services.AddScoped<INewsArticleCommentService, NewsArticleCommentService>();
 
@@ -55,6 +65,11 @@ namespace Sports.Alice
             SportsSettings sportsSettings = new SportsSettings();
             sportsSettingsSection.Bind(sportsSettings);
             services.AddSingleton(sportsSettings);
+
+            var sportsRuApiSettingsSection = Configuration.GetSection("SportsRuApiSettings");
+            var sportsRuApiSettings = new SportsRuApiSettings();
+            sportsRuApiSettingsSection.Bind(sportsRuApiSettings);
+            services.AddSingleton(sportsRuApiSettings);
 
             services.AddHostedService<SyncNewsWorker>();
             services.AddHostedService<SyncNewsCommentsWorker>();

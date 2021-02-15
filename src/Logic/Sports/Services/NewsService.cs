@@ -1,5 +1,6 @@
 ﻿using Sports.Data.Context;
 using Sports.Data.Entities;
+using Sports.Data.Services.Interfaces;
 using Sports.Models;
 using Sports.Services.Interfaces;
 using System;
@@ -12,10 +13,12 @@ namespace Sports.Services
     public class NewsService : INewsService
     {
         private readonly SportsContext _sportsContext;
+        private readonly INewsArticleDataService _newsDataService;
 
-        public NewsService(SportsContext sportsContext)
+        public NewsService(SportsContext sportsContext, INewsArticleDataService newsDataService)
         {
             _sportsContext = sportsContext;
+            _newsDataService = newsDataService;
         }
 
         public NewsArticleModel GetById(Guid id)
@@ -53,11 +56,7 @@ namespace Sports.Services
 
         public IEnumerable<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, int newsCount)
         {
-            var date = fromDate.UtcDateTime;
-            return _sportsContext.NewsArticles
-                .Where(x => x.PublishedDate >= date)
-                .OrderByDescending(x => x.CommentsCount)
-                .Take(newsCount)
+            return _newsDataService.GetPopularNews(fromDate, newsCount)
                 .Select(x => new NewsArticleModel()
                 {
                     Id = x.NewsArticleId,

@@ -14,16 +14,18 @@ namespace Sports.Alice.Workers
     {
         protected abstract TimeSpan TimerInterval { get; }
         protected IServiceProvider ServiceProvider { get; }
-        private Timer _timer;        
+        private Timer _timer;
+        private bool _isFirstTimeRun;
 
         protected Worker(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
+            _isFirstTimeRun = true;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimerInterval);
+            _timer = new Timer(Execute, null, TimeSpan.Zero, TimerInterval);
             return Task.CompletedTask;
         }
 
@@ -31,6 +33,16 @@ namespace Sports.Alice.Workers
         {
             _timer?.Change(Timeout.Infinite, 0);
             return base.StopAsync(cancellationToken);
+        }
+
+        protected void Execute(object state)
+        {
+            if(_isFirstTimeRun)
+            {
+                _isFirstTimeRun = false;
+                return;
+            }
+            DoWork(state);
         }
 
         protected abstract void DoWork(object state);

@@ -14,7 +14,8 @@ namespace Sports.SportsRu.Api.Tests.TestsInfrastructure.Fixtures
         public SportsRuApiFixture()
         {
             var logger = Mock.Of<ILogger<SportsRuApiService>>();
-            SportsRuApiService = new SportsRuApiService(logger);
+            var sportsRuApiSettings = new SportsRuApiSettings("https://www.sports.ru", "https://stat.sports.ru");
+            SportsRuApiService = new SportsRuApiService(sportsRuApiSettings, logger);
         }
     }
 }

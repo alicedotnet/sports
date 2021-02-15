@@ -16,7 +16,7 @@ namespace Sports.Alice.Workers
 
         private readonly int _daysToKeepData;
 
-        public CleanWorker(IOptions<SportsSettings> sportsSettings, IServiceProvider serviceProvider) 
+        public CleanWorker(SportsSettings sportsSettings, IServiceProvider serviceProvider) 
             : base(serviceProvider)
         {
             if(sportsSettings == null)
@@ -24,7 +24,7 @@ namespace Sports.Alice.Workers
                 throw new ArgumentNullException(nameof(sportsSettings));
             }
             TimerInterval = TimeSpan.FromDays(1);
-            _daysToKeepData = sportsSettings.Value.DaysToKeepData;
+            _daysToKeepData = sportsSettings.DaysToKeepData;
         }
 
         protected override void DoWork(object state)

@@ -48,12 +48,13 @@ namespace Sports.Alice.Scenes
         public override IAliceResponseBase Reply(SportsRequest sportsRequest)
         {
             var fromDate = DateTimeOffset.Now.AddDays(-1);
-            NewsArticleModel newsArticle;
+            NewsArticleModel newsArticle = null;
             if (sportsRequest.State.Session.NextNewsArticleId != Guid.Empty)
             {
                 newsArticle = _newsService.GetById(sportsRequest.State.Session.NextNewsArticleId);
             }
-            else
+
+            if(newsArticle == null)
             {
                 newsArticle = _newsService.GetPopularNews(fromDate, 1).FirstOrDefault();
             }
@@ -73,11 +74,12 @@ namespace Sports.Alice.Scenes
                     };
                     string ttsEnding = string.Empty;
                     var nextNewsArticle = _newsService.GetNextPopularNewsArticle(fromDate, newsArticle.Id);
+                    Guid nextNewsArticleId = Guid.Empty;
                     if (nextNewsArticle != null)
                     {
                         ttsEnding = $"{AliceHelper.SilenceString500}{Sports_Resources.Tips_BestComments_Next}";
                         buttons.Add(new SportsButtonModel(Sports_Resources.Command_BestComments_Next));
-                        sportsRequest.State.Session.NextNewsArticleId = nextNewsArticle.Id;
+                        nextNewsArticleId = nextNewsArticle.Id;
                     }
                     buttons.Add(new SportsButtonModel(Sports_Resources.Command_LatestNews));
                     buttons.Add(new SportsButtonModel(Sports_Resources.Command_MainNews));
@@ -98,6 +100,7 @@ namespace Sports.Alice.Scenes
                     tts.Append(ttsEnding);
 
                     var response = new SportsResponse(sportsRequest, text.ToString(), tts.ToString(), buttons);
+                    response.SessionState.NextNewsArticleId = nextNewsArticleId;
                     return response;
                 }
             }

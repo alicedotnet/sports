@@ -24,7 +24,7 @@ namespace Sports.Alice.Infrastructure.Converters
 
         public override void Write(Utf8JsonWriter writer, InfoCategory value, JsonSerializerOptions options)
         {
-            throw new NotImplementedException();
+            writer.WriteStringValue(value.ToString().ToLower());
         }
     }
 }

@@ -1,0 +1,22 @@
+﻿{
+  "read": {
+    "slots": {
+      "infoCategory": {
+        "type": "InfoCategory",
+        "tokens": {
+          "start": 0,
+          "end": 1
+        },
+        "value": "latest"
+      },
+      "infoType": {
+        "type": "InfoType",
+        "tokens": {
+          "start": 1,
+          "end": 2
+        },
+        "value": "news"
+      }
+    }
+  }
+}

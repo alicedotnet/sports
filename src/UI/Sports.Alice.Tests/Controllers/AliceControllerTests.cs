@@ -54,7 +54,10 @@ namespace Sports.Alice.Tests.Controllers
                             {
                                 Slots = new ReadSlots()
                                 {
-                                    BestComments = new AliceEntityStringModel()
+                                    InfoType = new AliceEntityInfoTypeModel()
+                                    {
+                                        Value = InfoType.Comments
+                                    }
                                 }
                             }
                         }
@@ -89,7 +92,14 @@ namespace Sports.Alice.Tests.Controllers
                             {
                                 Slots = new ReadSlots()
                                 {
-                                    LatestNews = new AliceEntityStringModel()
+                                    InfoType = new AliceEntityInfoTypeModel()
+                                    {
+                                        Value = InfoType.News
+                                    },
+                                    InfoCategory = new AliceEntityInfoCategoryModel()
+                                    {
+                                        Value = InfoCategory.Latest
+                                    }
                                 }
                             }
                         }

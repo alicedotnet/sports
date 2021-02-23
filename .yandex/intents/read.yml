@@ -1,38 +1,19 @@
 root:
-    $mainNews
-    $latestNews
-    $bestComments
+    [($infoCategory)* ($infoType)*]
 slots:
-    mainNews:
-        source: $mainNews
-    latestNews:
-        source: $latestNews
-    bestComments:
-        source: $bestComments
+    infoCategory:
+        source: $infoCategory
+        type: InfoCategory
+    infoType:
+        source: $infoType
+        type: InfoType
+        
+$infoCategory:
+    $InfoCategory
 
-$bestComments:
-    [($best)* ($comments)]
-$best:
-    %lemma
-    лучший
-$comments:
-    %lemma
-    комментарий
-    коммент
-$latestNews:
-    [($latest)* ($news)*]
-$mainNews:
-    [($main)* ($news)*]
-$main:
-    %lemma
-    главный
-    популярный
-$latest:
-    %lemma
-    последний
-$news:
-    %lemma
-    новости
+$infoType:
+    $InfoType    
+
 filler:
     %lemma
     $Filler

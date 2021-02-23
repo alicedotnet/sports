@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sports.Alice.Infrastructure.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -50,13 +51,39 @@ namespace Sports.Alice.Models
 
     public class ReadSlots
     {
-        [JsonPropertyName("mainNews")]
-        public AliceEntityStringModel MainNews { get; set; }
+        [JsonPropertyName("infoCategory")]
+        public AliceEntityInfoCategoryModel InfoCategory { get; set; }
 
-        [JsonPropertyName("latestNews")]
-        public AliceEntityStringModel LatestNews { get; set; }
+        [JsonPropertyName("infoType")]
+        public AliceEntityInfoTypeModel InfoType { get; set; }
+    }
 
-        [JsonPropertyName("bestComments")]
-        public AliceEntityStringModel BestComments { get; set; }
+    public enum InfoCategory
+    {
+        Undefined,
+        Main,
+        Latest,
+        Best
+    }
+
+    public class AliceEntityInfoCategoryModel : AliceEntityModel
+    {
+        [JsonPropertyName("value")]
+        [JsonConverter(typeof(InfoCategoryConverter))]
+        public InfoCategory Value { get; set; }
+    }
+
+    public enum InfoType
+    {
+        Undefined,
+        News,
+        Comments
+    }
+
+    public class AliceEntityInfoTypeModel : AliceEntityModel
+    {
+        [JsonPropertyName("value")]
+        [JsonConverter(typeof(InfoTypeConverter))]
+        public InfoType Value { get; set; }
     }
 }

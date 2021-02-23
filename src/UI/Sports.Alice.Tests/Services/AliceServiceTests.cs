@@ -50,7 +50,14 @@ namespace Sports.Alice.Tests.Services
                             {
                                 Slots = new ReadSlots()
                                 {
-                                    LatestNews = new AliceEntityStringModel()
+                                    InfoType = new AliceEntityInfoTypeModel()
+                                    {
+                                        Value = InfoType.News
+                                    },
+                                    InfoCategory = new AliceEntityInfoCategoryModel()
+                                    {
+                                        Value = InfoCategory.Latest
+                                    }
                                 }
                             }
                         }
@@ -87,7 +94,14 @@ namespace Sports.Alice.Tests.Services
                             {
                                 Slots = new ReadSlots()
                                 {
-                                    MainNews = new AliceEntityStringModel()
+                                    InfoCategory = new AliceEntityInfoCategoryModel()
+                                    {
+                                        Value = InfoCategory.Main
+                                    },
+                                    InfoType = new AliceEntityInfoTypeModel()
+                                    {
+                                        Value = InfoType.News
+                                    }
                                 }
                             }
                         }
@@ -124,7 +138,10 @@ namespace Sports.Alice.Tests.Services
                             {
                                 Slots = new ReadSlots()
                                 {
-                                    BestComments = new AliceEntityStringModel()
+                                    InfoType = new AliceEntityInfoTypeModel()
+                                    {
+                                        Value = InfoType.Comments
+                                    }
                                 }
                             }
                         }

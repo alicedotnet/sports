@@ -10,7 +10,9 @@ namespace Sports.Alice.Tests.TestsInfrastructure
 
         public static class Assets
         {
-            public const string AliceRequestFilePath = "TestsInfrastructure/Assets/AliceRequest.json";
+            public const string AssetsFolderPath = "TestsInfrastructure/Assets/";
+            public const string AliceRequestFilePath = AssetsFolderPath + "AliceRequest.json";
+            public const string IntentsFilePath = AssetsFolderPath + "Intents.json";
         }
     }
 }

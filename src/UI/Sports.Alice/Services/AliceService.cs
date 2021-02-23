@@ -43,17 +43,32 @@ namespace Sports.Alice.Services
 
             if(sportsRequest.Request.Nlu.Intents.Read != null)
             {
-                if (sportsRequest.Request.Nlu.Intents.Read.Slots.BestComments != null)
+                InfoType infoType = InfoType.Undefined;
+                if (sportsRequest.Request.Nlu.Intents.Read.Slots.InfoType != null)
+                {
+                    infoType = sportsRequest.Request.Nlu.Intents.Read.Slots.InfoType.Value;
+                }
+
+                InfoCategory infoCategory = InfoCategory.Undefined;
+                if(sportsRequest.Request.Nlu.Intents.Read.Slots.InfoCategory != null)
+                {
+                    infoCategory = sportsRequest.Request.Nlu.Intents.Read.Slots.InfoCategory.Value;
+                }
+
+                if (infoType == InfoType.Comments)
                 {
                     currentSceneType = SceneType.BestComments;
                 }
-                else if (sportsRequest.Request.Nlu.Intents.Read.Slots.MainNews != null)
+                else if (infoType == InfoType.News)
                 {
-                    currentSceneType = SceneType.MainNews;
-                }
-                else
-                {
-                    currentSceneType = SceneType.LatestNews;
+                    if(infoCategory == InfoCategory.Main)
+                    {
+                        currentSceneType = SceneType.MainNews;
+                    }
+                    else
+                    {
+                        currentSceneType = SceneType.LatestNews;
+                    }
                 }
             }
             else if(sportsRequest.Request.Nlu.Intents.IsHelp)

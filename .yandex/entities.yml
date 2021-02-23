@@ -2,3 +2,26 @@ $Filler:
     давай
     к
     пошли
+
+entity InfoCategory:
+    values:
+        main:
+            %lemma
+            главный
+            популярный
+        latest:
+            %lemma
+            последний
+        best:
+            %lemma
+            лучший
+
+entity InfoType:
+    values:
+        news:
+            %lemma
+            новость
+        comments:
+            %lemma
+            комментарий
+            коммент

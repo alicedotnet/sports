@@ -56,6 +56,9 @@ namespace Sports.Alice.Models
 
         [JsonPropertyName("infoType")]
         public AliceEntityInfoTypeModel InfoType { get; set; }
+
+        [JsonPropertyName("sport")]
+        public AliceEntitySportModel Sport { get; set; }
     }
 
     public enum InfoCategory
@@ -85,5 +88,20 @@ namespace Sports.Alice.Models
         [JsonPropertyName("value")]
         [JsonConverter(typeof(InfoTypeConverter))]
         public InfoType Value { get; set; }
+    }
+
+    public enum Sport
+    {
+        Undefined,
+        Football,
+        Hockey,
+        Basketball
+    }
+
+    public class AliceEntitySportModel : AliceEntityModel
+    {
+        [JsonPropertyName("value")]
+        [JsonConverter(typeof(SportConverter))]
+        public Sport Value { get; set; }
     }
 }

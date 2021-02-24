@@ -24,6 +24,8 @@ namespace Sports.Alice.Tests.Models
             Assert.Equal(InfoType.News, sportsIntents.Read.Slots.InfoType.Value);
             Assert.NotNull(sportsIntents.Read.Slots.InfoCategory);
             Assert.Equal(InfoCategory.Latest, sportsIntents.Read.Slots.InfoCategory.Value);
+            Assert.NotNull(sportsIntents.Read.Slots.Sport);
+            Assert.Equal(Sport.Football, sportsIntents.Read.Slots.Sport.Value);
         }
     }
 }

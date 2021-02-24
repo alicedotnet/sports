@@ -25,3 +25,18 @@ entity InfoType:
             %lemma
             комментарий
             коммент
+
+entity Sport:    
+    values:        
+        football:
+            %lemma
+            футбол
+            футбольный
+        hockey:
+            %lemma
+            хоккей
+            хоккейный
+        basketball:
+            %lemma
+            баскетбол
+            баскетбольный

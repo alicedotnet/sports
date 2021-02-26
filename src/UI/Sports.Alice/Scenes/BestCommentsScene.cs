@@ -47,6 +47,7 @@ namespace Sports.Alice.Scenes
 
         public override IAliceResponseBase Reply(SportsRequest sportsRequest)
         {
+            SportsResponse response;
             var fromDate = DateTimeOffset.Now.AddDays(-1);
             NewsArticleModel newsArticle = null;
             if (sportsRequest.State.Session.NextNewsArticleId != Guid.Empty)
@@ -58,12 +59,15 @@ namespace Sports.Alice.Scenes
             {
                 newsArticle = _newsService.GetPopularNews(fromDate, 1).FirstOrDefault();
             }
+            IEnumerable<NewsArticleCommentModel> comments = null;
             if (newsArticle != null)
             {
-                var comments = _newsArticleCommentService.GetBestComments(newsArticle.Id, _sportsSettings.CommentsToDisplay);
-                if (comments != null && comments.Any())
-                {
-                    var buttons = new List<AliceButtonModel>()
+                comments = _newsArticleCommentService.GetBestComments(newsArticle.Id, _sportsSettings.CommentsToDisplay);
+            }
+
+            if (comments != null && comments.Any())
+            {
+                var buttons = new List<AliceButtonModel>()
                     {
                         new AliceButtonModel()
                         {
@@ -72,44 +76,48 @@ namespace Sports.Alice.Scenes
                             Hide = false
                         }
                     };
-                    string ttsEnding = string.Empty;
-                    var nextNewsArticle = _newsService.GetNextPopularNewsArticle(fromDate, newsArticle.Id);
-                    Guid nextNewsArticleId = Guid.Empty;
-                    if (nextNewsArticle != null)
-                    {
-                        ttsEnding = $"{AliceHelper.SilenceString500}{Sports_Resources.Tips_BestComments_Next}";
-                        buttons.Add(new SportsButtonModel(Sports_Resources.Command_BestComments_Next));
-                        nextNewsArticleId = nextNewsArticle.Id;
-                    }
-                    buttons.Add(new SportsButtonModel(Sports_Resources.Command_LatestNews));
-                    buttons.Add(new SportsButtonModel(Sports_Resources.Command_MainNews));
-
-                    var text = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
-                    var tts = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title}\"{AliceHelper.SilenceString500}");
-                    foreach (var comment in comments)
-                    {
-                        string textComment = $"\n\n{EmojiLibrary.SpeechBalloon} {comment.CommentText} {EmojiLibrary.ThumbsUp}{comment.CommentRating}";
-                        string textTts = $"{AliceHelper.SilenceString500}{comment.CommentText}";
-                        if (text.Length + textComment.Length <= AliceResponseModel.TextMaxLenght
-                            && tts.Length + textTts.Length + ttsEnding.Length <= AliceResponseModel.TtsMaxLenght)
-                        {
-                            text.Append(textComment);
-                            tts.Append(textTts);
-                        }
-                    }
-                    tts.Append(ttsEnding);
-
-                    var response = new SportsResponse(sportsRequest, text.ToString(), tts.ToString(), buttons);
-                    response.SessionState.NextNewsArticleId = nextNewsArticleId;
-                    return response;
+                string ttsEnding = string.Empty;
+                var nextNewsArticle = _newsService.GetNextPopularNewsArticle(fromDate, newsArticle.Id);
+                Guid nextNewsArticleId = Guid.Empty;
+                if (nextNewsArticle != null)
+                {
+                    ttsEnding = $"{AliceHelper.SilenceString500}{Sports_Resources.Tips_BestComments_Next}";
+                    buttons.Add(new SportsButtonModel(Sports_Resources.Command_BestComments_Next));
+                    nextNewsArticleId = nextNewsArticle.Id;
                 }
+                buttons.Add(new SportsButtonModel(Sports_Resources.Command_LatestNews));
+                buttons.Add(new SportsButtonModel(Sports_Resources.Command_MainNews));
+
+                var text = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title} {GetTitleEnding(newsArticle)}\":");
+                var tts = new StringBuilder($"{Sports_Resources.BestComments_Title_Tts} \"{newsArticle.Title}\"{AliceHelper.SilenceString500}");
+                foreach (var comment in comments)
+                {
+                    string textComment = $"\n\n{EmojiLibrary.SpeechBalloon} {comment.CommentText} {EmojiLibrary.ThumbsUp}{comment.CommentRating}";
+                    string textTts = $"{AliceHelper.SilenceString500}{comment.CommentText}";
+                    if (text.Length + textComment.Length <= AliceResponseModel.TextMaxLenght
+                        && tts.Length + textTts.Length + ttsEnding.Length <= AliceResponseModel.TtsMaxLenght)
+                    {
+                        text.Append(textComment);
+                        tts.Append(textTts);
+                    }
+                }
+                tts.Append(ttsEnding);
+
+                response = new SportsResponse(sportsRequest, text.ToString(), tts.ToString(), buttons);
+                response.SessionState.NextNewsArticleId = nextNewsArticleId;
+                response.SessionState.CurrentScene = SceneType;
             }
-            var noResponseButtons = new List<AliceButtonModel>()
+            else
             {
-                new SportsButtonModel(Sports_Resources.Command_LatestNews),
-                new SportsButtonModel(Sports_Resources.Command_MainNews)
-            };
-            return new SportsResponse(sportsRequest, Sports_Resources.BestComments_NoComments, noResponseButtons);
+                var noResponseButtons = new List<AliceButtonModel>()
+                {
+                    new SportsButtonModel(Sports_Resources.Command_LatestNews),
+                    new SportsButtonModel(Sports_Resources.Command_MainNews)
+                };
+                response = new SportsResponse(sportsRequest, Sports_Resources.BestComments_NoComments, noResponseButtons);
+            }
+            response.SessionState.CurrentScene = SceneType;
+            return response;
         }
     }
 }

@@ -30,7 +30,9 @@ namespace Sports.Alice.Scenes
                     new SportsButtonModel(Sports_Resources.Command_MainNews),
                     new SportsButtonModel(Sports_Resources.Command_BestComments)
                 };
-            return new SportsResponse(sportsRequest, Sports_Resources.Welcome_Text, buttons);
+            var response = new SportsResponse(sportsRequest, Sports_Resources.Welcome_Text, buttons);
+            response.SessionState.CurrentScene = SceneType;
+            return response;
         }
     }
 }

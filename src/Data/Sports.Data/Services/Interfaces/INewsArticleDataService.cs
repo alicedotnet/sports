@@ -9,6 +9,7 @@ namespace Sports.Data.Services.Interfaces
 {
     public interface INewsArticleDataService
     {
-        IQueryable<NewsArticle> GetPopularNews(DateTimeOffset fromDate, int newsCount);
+        IQueryable<NewsArticle> GetPopularNews(
+            DateTimeOffset fromDate, int newsCount, SportKind sportKind = SportKind.Undefined);
     }
 }

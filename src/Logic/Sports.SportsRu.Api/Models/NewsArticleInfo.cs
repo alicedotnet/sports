@@ -27,8 +27,8 @@ namespace Sports.SportsRu.Api.Models
 
     public class ArticleSection
     {
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+        [JsonPropertyName("webname")]
+        public string WebName { get; set; }
     }
 
     public class NewsArticlePublished

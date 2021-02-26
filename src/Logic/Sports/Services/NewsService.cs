@@ -39,9 +39,14 @@ namespace Sports.Services
             return null;
         }
 
-        public IEnumerable<NewsArticleModel> GetLatestNews(int newsCount)
+        public IEnumerable<NewsArticleModel> GetLatestNews(int newsCount, SportKind sportKind = SportKind.Undefined)
         {
-            return _sportsContext.NewsArticles
+            IQueryable<NewsArticle> query = _sportsContext.NewsArticles;
+            if(sportKind != SportKind.Undefined && sportKind != SportKind.All)
+            {
+                query = query.Where(x => x.SportKind == sportKind);
+            }
+            return query
                 .OrderByDescending(x => x.PublishedDate)
                 .Take(newsCount)
                 .Select(x => new NewsArticleModel() 
@@ -54,9 +59,9 @@ namespace Sports.Services
                 .ToArray();
         }
 
-        public IEnumerable<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, int newsCount)
+        public IEnumerable<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, int newsCount, SportKind sportKind = SportKind.Undefined)
         {
-            return _newsDataService.GetPopularNews(fromDate, newsCount)
+            return _newsDataService.GetPopularNews(fromDate, newsCount, sportKind)
                 .Select(x => new NewsArticleModel()
                 {
                     Id = x.NewsArticleId,

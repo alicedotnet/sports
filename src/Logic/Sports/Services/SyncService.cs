@@ -143,7 +143,24 @@ namespace Sports.Services
             to.PublishedDate = DateTimeOffset
                         .FromUnixTimeSeconds(from.Published.Timestamp)
                         .UtcDateTime;
-            to.CategoryName = from.Section?.Name;
+            MapSportKind(from, to);
+        }
+
+        private static void MapSportKind(NewsArticleInfo from, NewsArticle to)
+        {
+            SportKind sportKind = SportKind.Undefined;
+            if(from.Section != null)
+            {
+                string webname = from.Section.WebName;
+                sportKind = webname switch
+                {
+                    "football" => SportKind.Football,
+                    "hockey" => SportKind.Hockey,
+                    "basketball" => SportKind.Basketball,
+                    _ => SportKind.Other,
+                };
+            }
+            to.SportKind = sportKind;
         }
 
         public async Task SyncPopularNewsCommentsAsync()

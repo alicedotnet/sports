@@ -1,4 +1,5 @@
 ﻿using Sports.Alice.Infrastructure.Converters;
+using Sports.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -90,18 +91,10 @@ namespace Sports.Alice.Models
         public InfoType Value { get; set; }
     }
 
-    public enum Sport
-    {
-        Undefined,
-        Football,
-        Hockey,
-        Basketball
-    }
-
     public class AliceEntitySportModel : AliceEntityModel
     {
         [JsonPropertyName("value")]
-        [JsonConverter(typeof(SportConverter))]
-        public Sport Value { get; set; }
+        [JsonConverter(typeof(SportKindConverter))]
+        public SportKind Value { get; set; }
     }
 }

@@ -44,6 +44,7 @@ namespace Sports.Tests.Services
             var article = _sportsContext.NewsArticles.First();
             Assert.NotNull(article.ExternalId);
             Assert.NotNull(article.PublishedDate);
+            Assert.True(_sportsContext.NewsArticles.Any(x => x.SportKind != SportKind.Undefined));
 
             SportsContextHelper.DeleteAllNews(_sportsContext);
         }

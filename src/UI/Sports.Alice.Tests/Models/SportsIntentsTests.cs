@@ -1,5 +1,6 @@
 ﻿using Sports.Alice.Models;
 using Sports.Alice.Tests.TestsInfrastructure;
+using Sports.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,7 +26,7 @@ namespace Sports.Alice.Tests.Models
             Assert.NotNull(sportsIntents.Read.Slots.InfoCategory);
             Assert.Equal(InfoCategory.Latest, sportsIntents.Read.Slots.InfoCategory.Value);
             Assert.NotNull(sportsIntents.Read.Slots.Sport);
-            Assert.Equal(Sport.Football, sportsIntents.Read.Slots.Sport.Value);
+            Assert.Equal(SportKind.Football, sportsIntents.Read.Slots.Sport.Value);
         }
     }
 }

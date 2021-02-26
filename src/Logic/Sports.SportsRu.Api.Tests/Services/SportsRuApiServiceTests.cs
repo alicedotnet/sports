@@ -44,7 +44,7 @@ namespace Sports.SportsRu.Api.Tests.Services
                     Assert.NotEmpty(newsArticle.ContentOption.Name);
                 }
                 Assert.NotNull(newsArticle.Section);
-                Assert.NotNull(newsArticle.Section.Name);
+                Assert.NotNull(newsArticle.Section.WebName);
             }
             WritePrettyJson(newsResponse.Content);
         }

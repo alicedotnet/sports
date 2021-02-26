@@ -24,7 +24,9 @@ namespace Sports.Alice.Scenes
                     new SportsButtonModel(Sports_Resources.Command_MainNews),
                     new SportsButtonModel(Sports_Resources.Command_BestComments)
                 };
-            return new SportsResponse(sportsRequest, Sports_Resources.Help_Text_Tts, buttons);
+            var response = new SportsResponse(sportsRequest, Sports_Resources.Help_Text_Tts, buttons);
+            response.SessionState.CurrentScene = SceneType;
+            return response;
         }
 
         protected static string GetTitleEnding(NewsArticleModel newsArticle)

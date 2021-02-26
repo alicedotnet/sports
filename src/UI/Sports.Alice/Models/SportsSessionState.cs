@@ -1,4 +1,5 @@
 ﻿using Sports.Alice.Scenes;
+using Sports.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,8 @@ namespace Sports.Alice.Models
 
         [JsonPropertyName("currentScene")]
         public SceneType CurrentScene { get; set; }
+
+        [JsonPropertyName("sportKind")]
+        public SportKind SportKind { get; set; }
     }
 }

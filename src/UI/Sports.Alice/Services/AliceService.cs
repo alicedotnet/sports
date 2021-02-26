@@ -79,7 +79,6 @@ namespace Sports.Alice.Services
             Scene currentScene;
             if (currentSceneType != SceneType.Undefined)
             {
-                sportsRequest.State.Session.CurrentScene = currentSceneType;
                 currentScene = _scenesProvider.GetScene(currentSceneType);
                 return currentScene.Reply(sportsRequest);
             }

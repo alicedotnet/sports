@@ -18,10 +18,16 @@ namespace Sports.Data.Services
             _sportsContext = sportsContext;
         }
 
-        public IQueryable<NewsArticle> GetPopularNews(DateTimeOffset fromDate, int newsCount)
+        public IQueryable<NewsArticle> GetPopularNews(
+            DateTimeOffset fromDate, int newsCount, SportKind sportKind = SportKind.Undefined)
         {
             var date = fromDate.UtcDateTime;
-            return _sportsContext.NewsArticles
+            IQueryable<NewsArticle> query = _sportsContext.NewsArticles;
+            if(sportKind != SportKind.Undefined && sportKind != SportKind.All)
+            {
+                query = query.Where(x => x.SportKind == sportKind);
+            }
+            return query
                 .Where(x => x.PublishedDate >= date)
                 .OrderByDescending(x => x.CommentsCount)
                 .Take(newsCount);

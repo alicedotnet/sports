@@ -10,7 +10,7 @@ namespace Sports.Alice.Scenes
 {
     public class HelpScene : Scene
     {
-        public override SceneType SceneType => SceneType.BestComments;
+        public override SceneType SceneType => SceneType.Help;
 
         public override Scene MoveToNextScene(SportsRequest sportsRequest)
         {

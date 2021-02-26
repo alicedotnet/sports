@@ -40,3 +40,6 @@ entity Sport:
             %lemma
             баскетбол
             баскетбольный
+        all:
+            %lemma
+            все

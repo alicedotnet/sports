@@ -1,6 +1,7 @@
 ﻿using Sports.Alice.Models;
 using Sports.Alice.Models.Settings;
 using Sports.Alice.Resources;
+using Sports.Data.Models;
 using Sports.Models;
 using Sports.Services.Interfaces;
 using System;
@@ -57,7 +58,7 @@ namespace Sports.Alice.Scenes
 
             if(newsArticle == null)
             {
-                newsArticle = _newsService.GetPopularNews(fromDate, 1).FirstOrDefault();
+                newsArticle = _newsService.GetPopularNews(fromDate, new PagedRequest(1)).FirstOrDefault();
             }
             IEnumerable<NewsArticleCommentModel> comments = null;
             if (newsArticle != null)

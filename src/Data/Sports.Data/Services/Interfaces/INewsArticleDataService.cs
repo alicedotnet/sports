@@ -1,4 +1,5 @@
 ﻿using Sports.Data.Entities;
+using Sports.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,6 @@ namespace Sports.Data.Services.Interfaces
     public interface INewsArticleDataService
     {
         IQueryable<NewsArticle> GetPopularNews(
-            DateTimeOffset fromDate, int newsCount, SportKind sportKind = SportKind.Undefined);
+            DateTimeOffset fromDate, PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined);
     }
 }

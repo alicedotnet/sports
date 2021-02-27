@@ -1,4 +1,5 @@
 ﻿using Sports.Data.Context;
+using Sports.Data.Models;
 using Sports.Services.Interfaces;
 using Sports.Tests.TestsInfrastructure;
 using Sports.Tests.TestsInfrastructure.Fixtures;
@@ -31,7 +32,7 @@ namespace Sports.Tests.Services
         {
             await _syncService.SyncNewsAsync().ConfigureAwait(false);
             var fromDate = DateTimeOffset.Now.AddDays(-1);
-            var article = _newsService.GetPopularNews(fromDate, 1).First();
+            var article = _newsService.GetPopularNews(fromDate, new PagedRequest(1)).First();
             var nextArticle = _newsService.GetNextPopularNewsArticle(fromDate, article.Id);
             Assert.NotEqual(article.Id, nextArticle.Id);
             SportsContextHelper.DeleteAllNews(_sportsContext);

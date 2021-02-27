@@ -1,5 +1,6 @@
 ﻿using Sports.Data.Context;
 using Sports.Data.Entities;
+using Sports.Data.Models;
 using Sports.Data.Services.Interfaces;
 using Sports.Models;
 using Sports.Services.Interfaces;
@@ -39,16 +40,18 @@ namespace Sports.Services
             return null;
         }
 
-        public IEnumerable<NewsArticleModel> GetLatestNews(int newsCount, SportKind sportKind = SportKind.Undefined)
+        public IEnumerable<NewsArticleModel> GetLatestNews(PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined)
         {
             IQueryable<NewsArticle> query = _sportsContext.NewsArticles;
             if(sportKind != SportKind.Undefined && sportKind != SportKind.All)
             {
                 query = query.Where(x => x.SportKind == sportKind);
             }
-            return query
+            query = query
                 .OrderByDescending(x => x.PublishedDate)
-                .Take(newsCount)
+                .Skip(pagedRequest.CurrentPage * pagedRequest.PageSize)
+                .Take(pagedRequest.PageSize);
+            return query
                 .Select(x => new NewsArticleModel() 
                 { 
                     Title = x.Title,
@@ -59,9 +62,9 @@ namespace Sports.Services
                 .ToArray();
         }
 
-        public IEnumerable<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, int newsCount, SportKind sportKind = SportKind.Undefined)
+        public IEnumerable<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined)
         {
-            return _newsDataService.GetPopularNews(fromDate, newsCount, sportKind)
+            return _newsDataService.GetPopularNews(fromDate, pagedRequest, sportKind)
                 .Select(x => new NewsArticleModel()
                 {
                     Id = x.NewsArticleId,

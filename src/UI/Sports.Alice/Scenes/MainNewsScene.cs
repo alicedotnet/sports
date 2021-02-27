@@ -2,6 +2,7 @@
 using Sports.Alice.Models.Settings;
 using Sports.Alice.Resources;
 using Sports.Data.Entities;
+using Sports.Data.Models;
 using Sports.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Sports.Alice.Scenes
                     new SportsButtonModel(Sports_Resources.Command_BestComments)
                 };
             SportKind sportKind = GetSportKind(sportsRequest);
-            var news = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), _sportsSettings.NewsToDisplay, sportKind);
+            var news = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), new PagedRequest(_sportsSettings.NewsToDisplay), sportKind);
             if (news.Any())
             {
                 var titles = news.Select(x => x.Title);

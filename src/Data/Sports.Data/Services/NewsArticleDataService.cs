@@ -1,5 +1,6 @@
 ﻿using Sports.Data.Context;
 using Sports.Data.Entities;
+using Sports.Data.Models;
 using Sports.Data.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Sports.Data.Services
         }
 
         public IQueryable<NewsArticle> GetPopularNews(
-            DateTimeOffset fromDate, int newsCount, SportKind sportKind = SportKind.Undefined)
+            DateTimeOffset fromDate, PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined)
         {
             var date = fromDate.UtcDateTime;
             IQueryable<NewsArticle> query = _sportsContext.NewsArticles;
@@ -30,7 +31,8 @@ namespace Sports.Data.Services
             return query
                 .Where(x => x.PublishedDate >= date)
                 .OrderByDescending(x => x.CommentsCount)
-                .Take(newsCount);
+                .Skip(pagedRequest.CurrentPage * pagedRequest.PageSize)
+                .Take(pagedRequest.PageSize);
         }
     }
 }

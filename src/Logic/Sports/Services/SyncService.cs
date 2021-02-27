@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sports.Data.Context;
 using Sports.Data.Entities;
+using Sports.Data.Models;
 using Sports.Data.Services.Interfaces;
 using Sports.Services.Interfaces;
 using Sports.SportsRu.Api.Helpers;
@@ -74,7 +75,7 @@ namespace Sports.Services
 
         public async Task SyncPopularNewsCommentsAsync(DateTimeOffset fromDate, int newsCount)
         {
-            var popularNews = _newsArticleDataService.GetPopularNews(fromDate, newsCount).ToArray();
+            var popularNews = _newsArticleDataService.GetPopularNews(fromDate, new PagedRequest(newsCount)).ToArray();
             foreach (var newsArticle in popularNews)
             {
                 if(int.TryParse(newsArticle.ExternalId, out int id))

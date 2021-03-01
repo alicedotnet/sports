@@ -40,7 +40,7 @@ namespace Sports.Services
             return null;
         }
 
-        public IEnumerable<NewsArticleModel> GetLatestNews(PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined)
+        public PagedResponse<NewsArticleModel> GetLatestNews(PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined)
         {
             IQueryable<NewsArticle> query = _sportsContext.NewsArticles;
             if(sportKind != SportKind.Undefined && sportKind != SportKind.All)
@@ -48,10 +48,13 @@ namespace Sports.Services
                 query = query.Where(x => x.SportKind == sportKind);
             }
             query = query
-                .OrderByDescending(x => x.PublishedDate)
+                .OrderByDescending(x => x.PublishedDate);
+
+            int totalCount = query.Count();
+
+            var latestNews = query
                 .Skip(pagedRequest.CurrentPage * pagedRequest.PageSize)
-                .Take(pagedRequest.PageSize);
-            return query
+                .Take(pagedRequest.PageSize)
                 .Select(x => new NewsArticleModel() 
                 { 
                     Title = x.Title,
@@ -60,11 +63,17 @@ namespace Sports.Services
                     IsHotContent = x.IsHotContent
                 })
                 .ToArray();
+            var result = new PagedResponse<NewsArticleModel>(latestNews, totalCount);
+            return result;
         }
 
-        public IEnumerable<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined)
+        public PagedResponse<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined)
         {
-            return _newsDataService.GetPopularNews(fromDate, pagedRequest, sportKind)
+            var popularNewsQuery = _newsDataService.GetPopularNews(fromDate, sportKind);
+            var totalCount = popularNewsQuery.Count();
+            var popularNews = popularNewsQuery
+                .Skip(pagedRequest.CurrentPage * pagedRequest.PageSize)
+                .Take(pagedRequest.PageSize)
                 .Select(x => new NewsArticleModel()
                 {
                     Id = x.NewsArticleId,
@@ -75,6 +84,8 @@ namespace Sports.Services
                     ExternalId = x.ExternalId
                 })
                 .ToArray();
+            var results = new PagedResponse<NewsArticleModel>(popularNews, totalCount);
+            return results;
         }
 
         public NewsArticleModel GetNextPopularNewsArticle(DateTimeOffset fromDate, Guid newsArticleId)

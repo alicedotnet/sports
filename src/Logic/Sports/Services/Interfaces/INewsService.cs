@@ -10,8 +10,8 @@ namespace Sports.Services.Interfaces
     public interface INewsService
     {
         NewsArticleModel GetById(Guid id);
-        IEnumerable<NewsArticleModel> GetLatestNews(PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined);
-        IEnumerable<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined);
+        PagedResponse<NewsArticleModel> GetLatestNews(PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined);
+        PagedResponse<NewsArticleModel> GetPopularNews(DateTimeOffset fromDate, PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined);
         NewsArticleModel GetNextPopularNewsArticle(DateTimeOffset fromDate, Guid newsArticleId);
     }
 }

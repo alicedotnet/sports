@@ -66,7 +66,7 @@ namespace Sports.Tests.Services
         {
             await _syncService.SyncNewsAsync().ConfigureAwait(false);
             await _syncService.SyncPopularNewsCommentsAsync(DateTimeOffset.Now.AddDays(-1), 1).ConfigureAwait(false);
-            var popularNewsArticle = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), new PagedRequest(1)).First();
+            var popularNewsArticle = _newsService.GetPopularNews(DateTimeOffset.Now.AddDays(-1), new PagedRequest(1)).Items.First();
             var comments = _newsArticleCommentService.GetBestComments(popularNewsArticle.Id, 5);
             Assert.NotEmpty(comments);
             WritePrettyJson(comments);

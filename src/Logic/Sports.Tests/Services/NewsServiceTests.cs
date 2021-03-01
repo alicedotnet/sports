@@ -32,7 +32,7 @@ namespace Sports.Tests.Services
         {
             await _syncService.SyncNewsAsync().ConfigureAwait(false);
             var fromDate = DateTimeOffset.Now.AddDays(-1);
-            var article = _newsService.GetPopularNews(fromDate, new PagedRequest(1)).First();
+            var article = _newsService.GetPopularNews(fromDate, new PagedRequest(1)).Items.First();
             var nextArticle = _newsService.GetNextPopularNewsArticle(fromDate, article.Id);
             Assert.NotEqual(article.Id, nextArticle.Id);
             SportsContextHelper.DeleteAllNews(_sportsContext);

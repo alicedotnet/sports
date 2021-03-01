@@ -11,6 +11,6 @@ namespace Sports.Data.Services.Interfaces
     public interface INewsArticleDataService
     {
         IQueryable<NewsArticle> GetPopularNews(
-            DateTimeOffset fromDate, PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined);
+            DateTimeOffset fromDate, SportKind sportKind = SportKind.Undefined);
     }
 }

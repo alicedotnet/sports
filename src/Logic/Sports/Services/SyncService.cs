@@ -75,7 +75,10 @@ namespace Sports.Services
 
         public async Task SyncPopularNewsCommentsAsync(DateTimeOffset fromDate, int newsCount)
         {
-            var popularNews = _newsArticleDataService.GetPopularNews(fromDate, new PagedRequest(newsCount)).ToArray();
+            var popularNews = _newsArticleDataService
+                .GetPopularNews(fromDate)
+                .Take(newsCount)
+                .ToArray();
             foreach (var newsArticle in popularNews)
             {
                 if(int.TryParse(newsArticle.ExternalId, out int id))

@@ -20,7 +20,7 @@ namespace Sports.Data.Services
         }
 
         public IQueryable<NewsArticle> GetPopularNews(
-            DateTimeOffset fromDate, PagedRequest pagedRequest, SportKind sportKind = SportKind.Undefined)
+            DateTimeOffset fromDate, SportKind sportKind = SportKind.Undefined)
         {
             var date = fromDate.UtcDateTime;
             IQueryable<NewsArticle> query = _sportsContext.NewsArticles;
@@ -30,9 +30,7 @@ namespace Sports.Data.Services
             }
             return query
                 .Where(x => x.PublishedDate >= date)
-                .OrderByDescending(x => x.CommentsCount)
-                .Skip(pagedRequest.CurrentPage * pagedRequest.PageSize)
-                .Take(pagedRequest.PageSize);
+                .OrderByDescending(x => x.CommentsCount);
         }
     }
 }

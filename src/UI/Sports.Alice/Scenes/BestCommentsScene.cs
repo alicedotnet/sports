@@ -58,7 +58,7 @@ namespace Sports.Alice.Scenes
 
             if(newsArticle == null)
             {
-                newsArticle = _newsService.GetPopularNews(fromDate, new PagedRequest(1)).Items.FirstOrDefault();
+                newsArticle = _newsService.GetPopularNews(fromDate, new PagedRequest(1, 0)).Items.FirstOrDefault();
             }
             IEnumerable<NewsArticleCommentModel> comments = null;
             if (newsArticle != null)

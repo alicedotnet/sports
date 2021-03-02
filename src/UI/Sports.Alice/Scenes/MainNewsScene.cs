@@ -34,8 +34,11 @@ namespace Sports.Alice.Scenes
                     new SportsButtonModel(Sports_Resources.Command_BestComments)
                 };
             SportKind sportKind = GetSportKind(sportsRequest);
+            int pageIndex = sportsRequest.State.Session.PageIndex;
             var news = _newsService
-                .GetPopularNews(DateTimeOffset.Now.AddDays(-1), new PagedRequest(_sportsSettings.NewsToDisplay), sportKind)
+                .GetPopularNews(DateTimeOffset.Now.AddDays(-1), 
+                    new PagedRequest(_sportsSettings.NewsToDisplay, pageIndex), 
+                    sportKind)
                 .Items;
             if (news.Any())
             {

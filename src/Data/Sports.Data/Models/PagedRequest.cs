@@ -8,13 +8,13 @@ namespace Sports.Data.Models
 {
     public class PagedRequest
     {
-        public int CurrentPage { get; set; }
         public int PageSize { get; set; }
+        public int PageIndex { get; set; }
 
-        public PagedRequest(int pageSize)
+        public PagedRequest(int pageSize, int pageIndex = 0)
         {
-            CurrentPage = 0;
             PageSize = pageSize;
+            PageIndex = pageIndex;
         }
     }
 }

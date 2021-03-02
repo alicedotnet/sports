@@ -53,7 +53,7 @@ namespace Sports.Services
             int totalCount = query.Count();
 
             var latestNews = query
-                .Skip(pagedRequest.CurrentPage * pagedRequest.PageSize)
+                .Skip(pagedRequest.PageIndex * pagedRequest.PageSize)
                 .Take(pagedRequest.PageSize)
                 .Select(x => new NewsArticleModel() 
                 { 
@@ -72,7 +72,7 @@ namespace Sports.Services
             var popularNewsQuery = _newsDataService.GetPopularNews(fromDate, sportKind);
             var totalCount = popularNewsQuery.Count();
             var popularNews = popularNewsQuery
-                .Skip(pagedRequest.CurrentPage * pagedRequest.PageSize)
+                .Skip(pagedRequest.PageIndex * pagedRequest.PageSize)
                 .Take(pagedRequest.PageSize)
                 .Select(x => new NewsArticleModel()
                 {

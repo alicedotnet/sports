@@ -18,5 +18,8 @@ namespace Sports.Alice.Models
 
         [JsonPropertyName("sportKind")]
         public SportKind SportKind { get; set; }
+
+        [JsonPropertyName("pageIndex")]
+        public int PageIndex { get; set; }
     }
 }

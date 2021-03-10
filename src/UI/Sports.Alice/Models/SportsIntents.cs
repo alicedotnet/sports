@@ -19,6 +19,15 @@ namespace Sports.Alice.Models
         [JsonPropertyName("next")]
         public AliceIntentModel Next { get; set; }
 
+        [JsonIgnore]
+        public bool IsNext => Next != null;
+
+        [JsonPropertyName("back")]
+        public AliceIntentModel Back { get; set; }
+
+        [JsonIgnore]
+        public bool IsBack => Back != null;
+
         [JsonPropertyName(AliceConstants.AliceIntents.Help)]
         public AliceIntentModel YandexHelp { get; set; }
 

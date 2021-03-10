@@ -28,7 +28,7 @@ namespace Sports.Alice.Scenes
         protected override PagedResponse<NewsArticleModel> GetNews(int pageIndex, SportKind sportKind)
         {
             return NewsService
-                .GetLatestNews(new PagedRequest(SportsSettings.NewsToDisplay, pageIndex), sportKind);
+                .GetLatestNews(new PagedRequest(NewsPerPage, pageIndex), sportKind);
         }
     }
 }

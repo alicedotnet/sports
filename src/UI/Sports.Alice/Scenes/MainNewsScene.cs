@@ -30,7 +30,7 @@ namespace Sports.Alice.Scenes
         {
             return NewsService
                 .GetPopularNews(DateTimeOffset.Now.AddDays(-1),
-                    new PagedRequest(SportsSettings.NewsToDisplay, pageIndex),
+                    new PagedRequest(NewsPerPage, pageIndex),
                     sportKind);
         }
     }

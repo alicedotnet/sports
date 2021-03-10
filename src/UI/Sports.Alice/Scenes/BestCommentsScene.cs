@@ -34,7 +34,7 @@ namespace Sports.Alice.Scenes
 
         public override Scene MoveToNextScene(SportsRequest sportsRequest)
         {
-            if(sportsRequest.Request.Nlu.Intents.Next != null)
+            if(sportsRequest.Request.Nlu.Intents.IsNext)
             {
                 return this;
             }

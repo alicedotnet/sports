@@ -5,6 +5,7 @@ using Sports.Data.Entities;
 using Sports.Data.Models;
 using Sports.Models;
 using Sports.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Yandex.Alice.Sdk.Helpers;
@@ -19,24 +20,31 @@ namespace Sports.Alice.Scenes
         protected abstract string HeaderText { get; }
         protected abstract string NoNewsText { get; }
         protected INewsService NewsService { get; }
-        protected SportsSettings SportsSettings { get; }
+        protected int NewsPerPage { get; }
 
         public NewsScene(INewsService newsService, SportsSettings sportsSettings)
         {
             NewsService = newsService;
-            SportsSettings = sportsSettings;
+            NewsPerPage = sportsSettings.NewsToDisplay;
         }
 
         protected abstract PagedResponse<NewsArticleModel> GetNews(int pageIndex, SportKind sportKind);
 
         public override Scene MoveToNextScene(SportsRequest sportsRequest)
         {
-            if (sportsRequest.Request.Nlu.Intents != null
-                && sportsRequest.Request.Nlu.Intents.Read != null
-                && sportsRequest.Request.Nlu.Intents.Read.Slots.Sport != null
-                && sportsRequest.Request.Nlu.Intents.Read.Slots.Sport.Value != SportKind.Undefined)
+            if (sportsRequest.Request.Nlu.Intents != null)
             {
-                return this;
+                if(sportsRequest.Request.Nlu.Intents.Read != null
+                    && sportsRequest.Request.Nlu.Intents.Read.Slots.Sport != null
+                    && sportsRequest.Request.Nlu.Intents.Read.Slots.Sport.Value != SportKind.Undefined)
+                {
+                    return this;
+                }
+                if(sportsRequest.Request.Nlu.Intents.IsNext
+                    || sportsRequest.Request.Nlu.Intents.IsBack)
+                {
+                    return this;
+                }
             }
             return null;
         }
@@ -48,11 +56,23 @@ namespace Sports.Alice.Scenes
 
         public override IAliceResponseBase Reply(SportsRequest sportsRequest)
         {
-            var buttons = new List<AliceButtonModel>(Buttons);
             SportKind sportKind = GetSportKind(sportsRequest);
-            int pageIndex = sportsRequest.State.Session.PageIndex;
-            var news = GetNews(pageIndex, sportKind)
-                .Items;
+            int pageIndex = GetPageIndex(sportsRequest);
+            var newsResponse = GetNews(pageIndex, sportKind);
+            int maxPageIndex = (int)Math.Ceiling(newsResponse.Total / (float)NewsPerPage) - 1;
+
+            var buttons = new List<AliceButtonModel>();
+            if (pageIndex > 0)
+            {
+                buttons.Add(new SportsButtonModel("назад"));
+            }
+            if(pageIndex >= 0  && pageIndex < maxPageIndex)
+            {
+                buttons.Add(new SportsButtonModel("вперед"));
+            }
+            buttons.AddRange(Buttons);
+            
+            var news = newsResponse.Items;
             if (news.Any())
             {
                 var titles = news.Select(x => x.Title);
@@ -84,6 +104,7 @@ namespace Sports.Alice.Scenes
                     new AliceButtonModel("баскетбол"),
                     new AliceButtonModel("все")
                 });
+                response.SessionState.PageIndex = pageIndex;
                 response.SessionState.SportKind = sportKind;
                 response.SessionState.CurrentScene = SceneType;
                 return response;
@@ -96,7 +117,28 @@ namespace Sports.Alice.Scenes
             }
         }
 
-        protected SportKind GetSportKind(SportsRequest sportsRequest)
+        private int GetPageIndex(SportsRequest sportsRequest)
+        {
+            int pageIndex = 0;
+            if(sportsRequest.State.Session.CurrentScene == SceneType)
+            {
+                pageIndex = sportsRequest.State.Session.PageIndex;
+                if (sportsRequest.Request.Nlu.Intents != null)
+                {
+                    if (sportsRequest.Request.Nlu.Intents.IsNext)
+                    {
+                        pageIndex++;
+                    }
+                    else if (sportsRequest.Request.Nlu.Intents.IsBack)
+                    {
+                        pageIndex--;
+                    }
+                }
+            }
+            return pageIndex;
+        }
+
+        private SportKind GetSportKind(SportsRequest sportsRequest)
         {
             SportKind sportKind = SportKind.Undefined;
             if(sportsRequest.Request.Nlu.Intents != null

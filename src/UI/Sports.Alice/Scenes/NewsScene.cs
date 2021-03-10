@@ -125,7 +125,14 @@ namespace Sports.Alice.Scenes
                 pageIndex = sportsRequest.State.Session.PageIndex;
                 if (sportsRequest.Request.Nlu.Intents != null)
                 {
-                    if (sportsRequest.Request.Nlu.Intents.IsNext)
+                    if(sportsRequest.Request.Nlu.Intents.Read != null
+                        && sportsRequest.Request.Nlu.Intents.Read.Slots != null
+                        && sportsRequest.Request.Nlu.Intents.Read.Slots.Sport != null
+                        && sportsRequest.Request.Nlu.Intents.Read.Slots.Sport.Value != SportKind.Undefined)
+                    {
+                        pageIndex = 0;
+                    }
+                    else if (sportsRequest.Request.Nlu.Intents.IsNext)
                     {
                         pageIndex++;
                     }

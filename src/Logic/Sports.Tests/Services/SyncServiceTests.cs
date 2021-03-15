@@ -108,12 +108,12 @@ namespace Sports.Tests.Services
                 .First();
 
             string initialText = "&quot;это&quot;";
-            CommentInfo from = new CommentInfo()
+            CommentInfo from = new()
             {
                 Rating = new CommentRating(),
                 Text = initialText
             };
-            NewsArticleComment to = new NewsArticleComment();
+            NewsArticleComment to = new();
             mapMethod.Invoke(syncService, new object[] { from, to });
             Assert.NotEqual(from.Text, to.Text);
             string mappedText = "\"это\"";

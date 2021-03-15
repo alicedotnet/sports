@@ -49,7 +49,7 @@ namespace Sports.Alice.Tests.Scenes
         public void BestCommentsScene_Reply_UnknownGuid()
         {
             var bestCommentsScene = _serviceProvider.GetService<BestCommentsScene>();
-            Guid unknownNextNewsArticleId = new Guid("8a93a228-fd9f-47fe-b3d5-9c040e0dcc83");
+            Guid unknownNextNewsArticleId = new("8a93a228-fd9f-47fe-b3d5-9c040e0dcc83");
             var sportsRequest = new SportsRequest()
             {
                 State = new AliceStateModel<SportsSessionState, object>()

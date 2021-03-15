@@ -62,7 +62,7 @@ namespace Sports.Alice
             services.AddScoped<HelpScene>();
 
             var sportsSettingsSection = Configuration.GetSection("SportsSettings");
-            SportsSettings sportsSettings = new SportsSettings();
+            SportsSettings sportsSettings = new();
             sportsSettingsSection.Bind(sportsSettings);
             services.AddSingleton(sportsSettings);
 

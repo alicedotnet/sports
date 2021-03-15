@@ -23,6 +23,8 @@ namespace Sports.SportsRu.Api.Models
         public int CommentsCount { get; set; }
         [JsonPropertyName("section")]
         public ArticleSection Section { get; set; }
+        [JsonPropertyName("main")]
+        public bool? Main { get; set; }
     }
 
     public class ArticleSection

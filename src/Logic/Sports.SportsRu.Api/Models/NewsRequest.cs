@@ -21,5 +21,7 @@ namespace Sports.SportsRu.Api.Models
         public string NewsPriority { get; set; }
         [JsonPropertyName("content_origin")]
         public string ContentOrigin { get; set; }
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
     }
 }

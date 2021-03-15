@@ -35,20 +35,31 @@ namespace Sports.SportsRu.Api.Services
             _logger = logger;
         }
 
-        public async Task<ServiceResponse<NewsResponseCollection>> GetNewsAsync(NewsType newsType, NewsPriority newsPriority, NewsContentOrigin newsContentOrigin, int count)
+        public async Task<ServiceResponse<NewsResponseCollection>> GetNewsAsync(
+            NewsType newsType, NewsPriority newsPriority, 
+            NewsContentOrigin newsContentOrigin, int count,
+            Name name = Name.Undefined)
         {
             var newsRequest = new NewsRequest()
             {
                 Count = count,
                 Filter = new NewsRequestFilter()
             };
-            switch(newsType)
+            newsRequest.Filter.Type = newsType switch
             {
-                case NewsType.HomePage:
-                    newsRequest.Filter.Type = "homepage";
-                    break;
-            }
-            switch(newsPriority)
+                NewsType.HomePage => "homepage",
+                NewsType.SectionName => "section-name",
+                _ => throw new Exception($"Unknown {nameof(newsType)}: {newsType}")
+            };
+            newsRequest.Filter.Name = name switch
+            {
+                Name.Undefined => null,
+                Name.Football => "football",
+                Name.Hockey => "hockey",
+                Name.Basketball => "basketball",
+                _ => throw new Exception($"Unknown {nameof(name)}: {name}"),
+            };
+            switch (newsPriority)
             {
                 case NewsPriority.Main:
                     newsRequest.Filter.NewsPriority = "main";

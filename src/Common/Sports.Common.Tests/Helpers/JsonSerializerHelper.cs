@@ -8,7 +8,7 @@ namespace Sports.Common.Tests.Helpers
 {
     static class JsonSerializerHelper
     {
-        private static readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+        private static readonly JsonSerializerOptions _options = new()
         {
             WriteIndented = true,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping

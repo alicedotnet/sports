@@ -45,8 +45,22 @@ namespace Sports.SportsRu.Api.Tests.Services
                 }
                 Assert.NotNull(newsArticle.Section);
                 Assert.NotNull(newsArticle.Section.WebName);
+                Assert.NotNull(newsArticle.Main);
             }
             WritePrettyJson(newsResponse.Content);
+        }
+
+        [Theory]
+        [InlineData(Name.Football)]
+        [InlineData(Name.Hockey)]
+        [InlineData(Name.Basketball)]
+        public async Task GetNews_SportKind_Success(Name name)
+        {
+            var newsResponse = await _sportsRuApiService
+                .GetNewsAsync(NewsType.SectionName, NewsPriority.Main, NewsContentOrigin.Mixed, 10, name).ConfigureAwait(false);
+            Assert.True(newsResponse.IsSuccess, newsResponse.ErrorMessage);
+            Assert.NotNull(newsResponse.Content);
+            Assert.NotEmpty(newsResponse.Content);
         }
 
         [Fact]

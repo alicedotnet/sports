@@ -1,4 +1,4 @@
-# sports news ![sports](https://github.com/alexvolchetsky/sports/workflows/sports/badge.svg) [![Pulls](https://shields.beevelop.com/docker/pulls/alexvolchetsky/sports.svg?style=flat-square)](https://hub.docker.com/r/alexvolchetsky/sports) 
+# sports news ![sports](https://github.com/alexvolchetsky/sports/workflows/sports/badge.svg)
 Yandex Alice skill for reading sports news from https://www.sports.ru
 
 

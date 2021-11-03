@@ -42,7 +42,7 @@ namespace Sports.Alice.Tests.Services
                 Session = new AliceSessionModel(),
                 Request = new AliceRequestModel<SportsIntents>()
                 {
-                    Nlu = new AliceNLUModel<SportsIntents>()
+                    Nlu = new AliceNluModel<SportsIntents>()
                     {
                         Intents = new SportsIntents()
                         {
@@ -86,7 +86,7 @@ namespace Sports.Alice.Tests.Services
                 Session = new AliceSessionModel(),
                 Request = new AliceRequestModel<SportsIntents>()
                 {
-                    Nlu = new AliceNLUModel<SportsIntents>()
+                    Nlu = new AliceNluModel<SportsIntents>()
                     {
                         Intents = new SportsIntents()
                         {
@@ -130,7 +130,7 @@ namespace Sports.Alice.Tests.Services
                 Session = new AliceSessionModel(),
                 Request = new AliceRequestModel<SportsIntents>()
                 {
-                    Nlu = new AliceNLUModel<SportsIntents>()
+                    Nlu = new AliceNluModel<SportsIntents>()
                     {
                         Intents = new SportsIntents()
                         {
@@ -169,7 +169,7 @@ namespace Sports.Alice.Tests.Services
                 Session = new AliceSessionModel(),
                 Request = new AliceRequestModel<SportsIntents>()
                 {
-                    Nlu = new AliceNLUModel<SportsIntents>()
+                    Nlu = new AliceNluModel<SportsIntents>()
                     {
                         Intents = new SportsIntents()
                         {
